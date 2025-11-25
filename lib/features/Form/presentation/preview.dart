@@ -54,7 +54,7 @@ class _PreviewState extends State<Preview> {
     );
 
     return Scaffold(
-      appBar: CustomAppBar(title: 'Complaint form', icon: Icons.arrow_back),
+      appBar: CustomAppBar(title: 'Complaint', icon: Icons.arrow_back),
       body: Column(
         children: [
           Expanded(
