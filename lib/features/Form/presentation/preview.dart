@@ -49,7 +49,7 @@ class _PreviewState extends State<Preview> {
             bodyMedium: Theme.of(context)
                 .textTheme
                 .bodyMedium
-                ?.copyWith(color: Colors.black),
+                ?.copyWith(color: Colors.white),
           ),
     );
 
@@ -229,7 +229,7 @@ class _PreviewState extends State<Preview> {
             });
                 }
               },
-              child: const Text("إضافة مستند"),
+              child: const Text("Upload Document"),
             ),
             ...documents.map((e) => ListTile(
             title: Text(e),
