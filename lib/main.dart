@@ -3,6 +3,8 @@ import 'package:internet_application_project/features/Form/presentation/preview.
 import 'package:internet_application_project/features/auth/presentation/login_page.dart';
 import 'package:internet_application_project/features/home_page/presentation/home_page.dart';
 
+import 'features/auth/presentation/login_page.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -18,7 +20,7 @@ class MyApp extends StatelessWidget {
 
       ),
       debugShowCheckedModeBanner: false,
-      home: Preview(),
+      home: LoginPage(),
     );
   }
 }
