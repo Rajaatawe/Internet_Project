@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:internet_application_project/core/constants/app_assets.dart';
 import 'package:internet_application_project/core/resources/colorfile.dart';
 import 'package:internet_application_project/core/validator/validators.dart';
@@ -8,6 +9,10 @@ import 'package:internet_application_project/core/widgets/custom_button.dart';
 import 'package:internet_application_project/features/auth/presentation/register.dart';
 import 'package:internet_application_project/features/auth/widgets/auth_text_field.dart';
 import 'package:internet_application_project/features/auth/widgets/captcha_dialog.dart';
+
+import '../../../core/models/enum/states_enum.dart';
+import '../cubit/auth_cubit.dart';
+import '../cubit/auth_state.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -237,43 +242,76 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(height: _getSpacing(context)),
 
                     // Login button
-                    CustomButton(
-                      formKey: formKey,
-                      width: _getButtonWidth(context),
-                      height: _getButtonHeight(context),
-                      title: 'Login',
-                      onTap: () async {
-                        if (formKey.currentState!.validate()) {
-                          final success = await showCaptcha(context);
-                          if (success && mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: const Text("Login allowed!"),
-                                behavior: isIOS ? SnackBarBehavior.fixed : SnackBarBehavior.floating,
-                                shape: isIOS 
-                                    ? RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
-                                    : null,
-                              ),
-                            );
-                          }
-                        } else if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text(
-                                "Please fix the errors before continuing.",
-                              ),
-                              backgroundColor: Colors.red,
-                              behavior: isIOS ? SnackBarBehavior.fixed : SnackBarBehavior.floating,
-                              shape: isIOS 
-                                  ? RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
-                                  : null,
-                            ),
+                    BlocConsumer<AuthCubit, AuthState>(
+                      buildWhen: (previous, current) =>
+                      current.loginState != previous.loginState,
+                      listenWhen: (previous, current) =>
+                      current.loginState != previous.loginState,
+                    listener: (context,state) {
+                      if (state.loginState == StateValue.loaded){
+                        print("print success Login");
+
+                      }else if(state.loginState == StateValue.error){
+                        print("Error login");
+                      }
+                    },
+                      builder: (context,state){
+                        if (state.loginState == StateValue.loading){
+                          return CustomButton(
+                            title: '',
+                              onTap: (){},
+                            width: _getButtonWidth(context),
+                            height: _getButtonHeight(context),
+                            backgroundColor: primaryColor,
+                            titleColor: Colors.white,
                           );
                         }
+                        else{
+                          return CustomButton(
+                            formKey: formKey,
+                            width: _getButtonWidth(context),
+                            height: _getButtonHeight(context),
+                            title: 'Login',
+                            onTap: () async {
+                              if (formKey.currentState!.validate()) {
+                                final success = await showCaptcha(context);
+                                if (success && mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: const Text("Login allowed!"),
+                                      behavior: isIOS ? SnackBarBehavior.fixed : SnackBarBehavior.floating,
+                                      shape: isIOS
+                                          ? RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
+                                          : null,
+                                    ),
+                                  );
+                                  BlocProvider.of<AuthCubit>(context).login(emailController.text, passwordController.text);
+                                  print('//////////////////////////////////////////////////////////////');
+                                  print("Login perfecto");
+                                  print('//////////////////////////////////////////////////////////////');
+
+                                }
+                              } else if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text(
+                                      "Please fix the errors before continuing.",
+                                    ),
+                                    backgroundColor: Colors.red,
+                                    behavior: isIOS ? SnackBarBehavior.fixed : SnackBarBehavior.floating,
+                                    shape: isIOS
+                                        ? RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
+                                        : null,
+                                  ),
+                                );
+                              }
+                            },
+                            backgroundColor: primaryColor,
+                            titleColor: Colors.white,
+                          );
+                      }
                       },
-                      backgroundColor: primaryColor,
-                      titleColor: Colors.white,
-                    ),
+                   ),
 
                     SizedBox(height: isDesktop ? 120 : 80),
 

@@ -82,9 +82,8 @@ class _CaptchaDialogState extends State<CaptchaDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            "Select ALL images containing a: ${targetLabel.toUpperCase()}",
+            "Select all images containing a: ${targetLabel.toUpperCase()}",
             style: const TextStyle(
-              fontWeight: FontWeight.bold,
               color: primaryColor,
             ),
           ),
@@ -93,7 +92,7 @@ class _CaptchaDialogState extends State<CaptchaDialog> {
             "(${correctLabels.length} images required)",
             style: TextStyle(color: thirdColor, fontSize: 13),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 70),
           Wrap(
             spacing: 10,
             runSpacing: 10,

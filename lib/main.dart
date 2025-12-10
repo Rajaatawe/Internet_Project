@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:internet_application_project/core/config/app_configt.dart';
+import 'package:internet_application_project/core/services/generalized_api.dart';
+
 import 'package:internet_application_project/features/notification_page/NotificationService.dart';
+import 'package:provider/provider.dart';
+import 'core/services/service_locator.dart';
+import 'features/auth/cubit/auth_cubit.dart';
+import 'features/auth/presentation/login_page.dart';
 import 'features/auth/presentation/register.dart';
 
 
@@ -30,8 +38,28 @@ void main() async {
   await safeFirebaseInit();
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  // to get saved preferences
+  final appConst = AppConst();
+  await appConst.init();
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        // AppConst provider
+        ChangeNotifierProvider.value(value: appConst),
+
+
+
+        // RemoteDatasource provider
+        Provider<RemoteService>(
+          create: (context) => RemoteService.getInstance(
+            context.read<AppConst>(),
+          ),
+        ),
+      ],   // Provide AppConst to RemoteDatasource
+      child: const MyApp(),
+    ),
+  );
 }
 
 
@@ -52,10 +80,20 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(fontFamily: 'Outfit'),
-      debugShowCheckedModeBanner: false,
-      home: const RegisterPage(),
+    return MultiBlocProvider(
+      providers: [
+         BlocProvider(
+              create: (_) => AuthCubit(
+                  remoteDatasource: context.read<RemoteService>())),
+        // BlocProvider(BlocProvider
+        //     create: (_) => HomePageCubit(
+        //         remoteService: context.read<RemoteService>())),
+      ],
+      child: MaterialApp(
+        theme: ThemeData(fontFamily: 'Outfit'),
+        debugShowCheckedModeBanner: false,
+        home: const LoginPage(),
+      ),
     );
   }
 }

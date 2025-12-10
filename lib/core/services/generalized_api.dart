@@ -58,10 +58,14 @@ class RemoteService {
       /// if success
       if (ErrorHandler.handleRemoteStatusCode(
           response.statusCode!, response.data)) {
-        final userMap = response.data["data"]["user"];
-        final token = response.data["data"]["token"];
+         
+        final userMap = response.data["message"]["user"];
+           print('object1');
+        final token = response.data["message"]["token"];
+        print('object2');
         final user = fromJson(userMap);
-
+        print(userMap);
+print('object');
         await appConstProvider.saveUser(userMap);
 
         if (token != null) {
