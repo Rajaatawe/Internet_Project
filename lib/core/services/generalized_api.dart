@@ -52,6 +52,8 @@ class RemoteService {
       );
       if (isResponseEncrypted) {
         debugPrint("encrypted response");
+                print(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
+
       }
       debugPrint('response is $response');
 
@@ -60,12 +62,19 @@ class RemoteService {
           response.statusCode!, response.data)) {
          
         final userMap = response.data["message"]["user"];
+        print(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
            print('object1');
+                      print('object1');
+
         final token = response.data["message"]["token"];
         print('object2');
+                print('object2');
+
         final user = fromJson(userMap);
         print(userMap);
-print('object');
+           print('object');
+                      print('object');
+
         await appConstProvider.saveUser(userMap);
 
         if (token != null) {
