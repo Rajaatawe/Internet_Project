@@ -48,6 +48,9 @@ dependencies:
   flutter_map: ^4.0.0
   permission_handler:
   file_picker: ^10.3.7
+  firebase_core: ^4.2.1
+  firebase_messaging: ^16.0.4
+  flutter_local_notifications: ^18.0.1
   
 dev_dependencies:
   flutter_test:
