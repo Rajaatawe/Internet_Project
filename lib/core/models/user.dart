@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final user = userFromJson(jsonString);
-
 import 'package:meta/meta.dart';
 import 'dart:convert';
 
@@ -56,30 +52,30 @@ class Message {
 class UserClass {
   final int id;
   final String firstName;
-  final dynamic middleName;
+  final String? middleName; // يمكن أن تكون null
   final String lastName;
   final String phone;
   final String email;
   final String identityNumber;
   final bool isActive;
   final DateTime lastLoginAt;
-  final dynamic governmentAgencyId;
-  final dynamic emailVerifiedAt;
+  final int? governmentAgencyId; // يمكن أن تكون null
+  final DateTime? emailVerifiedAt; // يمكن أن تكون null
   final DateTime createdAt;
   final DateTime updatedAt;
 
   UserClass({
     required this.id,
     required this.firstName,
-    required this.middleName,
+    this.middleName, // يمكن أن تكون null
     required this.lastName,
     required this.phone,
     required this.email,
     required this.identityNumber,
     required this.isActive,
     required this.lastLoginAt,
-    required this.governmentAgencyId,
-    required this.emailVerifiedAt,
+    this.governmentAgencyId, // يمكن أن تكون null
+    this.emailVerifiedAt, // يمكن أن تكون null
     required this.createdAt,
     required this.updatedAt,
   });
@@ -87,15 +83,15 @@ class UserClass {
   factory UserClass.fromJson(Map<String, dynamic> json) => UserClass(
     id: json["id"],
     firstName: json["first_name"],
-    middleName: json["middle_name"],
+    middleName: json["middle_name"], // يمكن أن تكون null
     lastName: json["last_name"],
     phone: json["phone"],
     email: json["email"],
     identityNumber: json["identity_number"],
-    isActive: json["is_active"],
+    isActive: json["is_active"] ?? false,
     lastLoginAt: DateTime.parse(json["last_login_at"]),
-    governmentAgencyId: json["government_agency_id"],
-    emailVerifiedAt: json["email_verified_at"],
+    governmentAgencyId: json["government_agency_id"], // يمكن أن تكون null
+    emailVerifiedAt: json["email_verified_at"] != null ? DateTime.parse(json["email_verified_at"]) : null, // يمكن أن تكون null
     createdAt: DateTime.parse(json["created_at"]),
     updatedAt: DateTime.parse(json["updated_at"]),
   );
@@ -103,15 +99,15 @@ class UserClass {
   Map<String, dynamic> toJson() => {
     "id": id,
     "first_name": firstName,
-    "middle_name": middleName,
+    "middle_name": middleName, // يمكن أن تكون null
     "last_name": lastName,
     "phone": phone,
     "email": email,
     "identity_number": identityNumber,
     "is_active": isActive,
     "last_login_at": lastLoginAt.toIso8601String(),
-    "government_agency_id": governmentAgencyId,
-    "email_verified_at": emailVerifiedAt,
+    "government_agency_id": governmentAgencyId, // يمكن أن تكون null
+    "email_verified_at": emailVerifiedAt?.toIso8601String(), // يمكن أن تكون null
     "created_at": createdAt.toIso8601String(),
     "updated_at": updatedAt.toIso8601String(),
   };

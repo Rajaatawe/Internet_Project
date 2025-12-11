@@ -23,7 +23,7 @@ class AuthCubit extends Cubit<AuthState> {
         'password': password,
       };
 
-      await _remoteDatasource.performAuthRequest("login", payload, User.fromJson, useToken: false);
+      await _remoteDatasource.performAuthRequest("login", payload, UserClass.fromJson, useToken: false);
 
       emit(state.copyWith(loginState: StateValue.loaded, loginMessage: "success"));
 
@@ -51,11 +51,24 @@ class AuthCubit extends Cubit<AuthState> {
     required String phone,
     required String email,
     required String password,
+     required String passwordConfirmation,
 
   }) async {
     emit(state.copyWith(registerState: StateValue.loading));
     try {
-      await Future.delayed(const Duration(seconds: 1));
+      Map<String,dynamic> data = {
+        'first_name':firstName,
+         'middle_name':middleName,
+          'last_name':lastName,
+           'phone':phone,
+            'identity_number':nationalNumber,
+             'password':password,
+              'password_confirmation':passwordConfirmation,
+              'email': email,
+
+
+      };
+      await _remoteDatasource.performAuthRequest('register',data , User.fromJson);
       emit(state.copyWith(
         registerState: StateValue.success,
         registerMessage: "Register success",
@@ -74,7 +87,7 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> sendOtp(String email) async {
     emit(state.copyWith(otpState: StateValue.loading));
     try {
-      await Future.delayed(const Duration(seconds: 1));
+    await _remoteDatasource.performAuthRequest("send-otp",{'email':email},(map){}, useToken: false);
       emit(state.copyWith(
         otpState: StateValue.success,
         otpMessage: "OTP sent",
@@ -90,10 +103,10 @@ class AuthCubit extends Cubit<AuthState> {
   // --------------------------
   // VERIFY OTP
   // --------------------------
-  Future<void> verifyOtp(String code) async {
+  Future<void> verifyOtp(String code, String email) async {
     emit(state.copyWith(verifyOtpState: StateValue.loading));
     try {
-      await Future.delayed(const Duration(seconds: 1));
+    await _remoteDatasource.performAuthRequest("verify-otp",{'code':code ,'email':email}, (map){}, useToken: false);
       emit(state.copyWith(
         verifyOtpState: StateValue.success,
         verifyOtpMessage: "OTP verified",
@@ -112,7 +125,7 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> logout() async {
     emit(state.copyWith(logoutState: StateValue.loading));
     try {
-      await Future.delayed(const Duration(seconds: 1));
+     await _remoteDatasource.performLogoutRequest("logout",useToken: true);
       emit(state.copyWith(
         logoutState: StateValue.success,
         logoutMessage: "Logout done",
@@ -125,7 +138,7 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  // --------------------------
+// --------------------------
   // FORGOT PASSWORD
   // --------------------------
   Future<void> forgetPassword(String email) async {

@@ -14,7 +14,7 @@ class AppConst extends ChangeNotifier {
 
   late SharedPreferences _prefs;
 
-  User? _user;
+  UserClass? _user;
   bool _isLoggedIn = false;
   bool _isApproved = false;
   bool _isDarkMode = false;
@@ -25,7 +25,7 @@ class AppConst extends ChangeNotifier {
   Map<String, dynamic>? _previousArguments;
   bool _previousWantsRebuild = false;
 
-  User? get user => _user;
+  UserClass? get user => _user;
   bool get isLoggedIn => _isLoggedIn;
   bool get isApproved => _isApproved;
   bool get isDarkMode => _isDarkMode;
@@ -99,7 +99,7 @@ class AppConst extends ChangeNotifier {
 
   Future<void> saveUser(Map<String,dynamic> user) async {
     debugPrint("[AppConst] saveUser() → Saving user: ${user}");
-    _user = User.fromJson(user);
+    _user = UserClass.fromJson(user);
     _isLoggedIn = true;
 
 
@@ -115,7 +115,7 @@ class AppConst extends ChangeNotifier {
     if (userString != null) {
       try {
         final json = jsonDecode(userString);
-        final loadedUser = User.fromJson(json);
+        final loadedUser = UserClass.fromJson(json);
         _user = loadedUser;
         debugPrint("[AppConst] User loaded from prefs: ${_user!.toJson()}");
       } catch (e) {

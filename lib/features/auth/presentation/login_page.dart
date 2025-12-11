@@ -252,7 +252,7 @@ class _LoginPageState extends State<LoginPage> {
                         print("print success Login");
 
                       }else if(state.loginState == StateValue.error){
-                        print("Error login");
+                        print("///////////////////////////////////////////////Error login");
                       }
                     },
                       builder: (context,state){

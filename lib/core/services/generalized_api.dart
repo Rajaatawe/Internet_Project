@@ -52,7 +52,7 @@ class RemoteService {
       );
       if (isResponseEncrypted) {
         debugPrint("encrypted response");
-                print(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
+                print(",ظظظظظظظظظظظظظظظظظظظظظظظظظظظظظظظظظظ,,,,,,,,,,,,,");
 
       }
       debugPrint('response is $response');
@@ -62,20 +62,23 @@ class RemoteService {
           response.statusCode!, response.data)) {
          
         final userMap = response.data["message"]["user"];
+         print(userMap);
         print(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
            print('object1');
-                      print('object1');
 
         final token = response.data["message"]["token"];
         print('object2');
-                print('object2');
 
+ print(userMap);
+
+debugPrint("reached from json ");
         final user = fromJson(userMap);
-        print(userMap);
-           print('object');
-                      print('object');
+        debugPrint("left from json ");
+   
 
+debugPrint("reached save user");
         await appConstProvider.saveUser(userMap);
+        debugPrint("left save user ");
 
         if (token != null) {
           final prefs = await SharedPreferences.getInstance();
