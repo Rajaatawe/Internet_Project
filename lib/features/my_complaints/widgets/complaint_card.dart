@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:internet_application_project/core/resources/colorfile.dart';
 import 'package:internet_application_project/core/widgets/custom_button.dart';
 import 'package:internet_application_project/core/resources/responsive_util.dart';
+import 'package:internet_application_project/features/my_complaints/presentation/view_documents_page.dart';
+import 'package:internet_application_project/features/my_complaints/widgets/complaint_card_details.dart';
+import 'package:latlong2/latlong.dart';
 
 class ComplaintCard extends StatelessWidget {
   const ComplaintCard({super.key});
@@ -83,13 +86,6 @@ class ComplaintCard extends StatelessWidget {
                       "Governmental entity: Ministry of Water",
                       titleFont,
                     ),
-                    SizedBox(height: spacing),
-                    _buildLine(
-                      "Description: Water supply disruption for 48h.",
-                      titleFont,
-                    ),
-                    SizedBox(height: spacing),
-                    _buildLine("Status: New", titleFont),
                   ],
                 ),
               ),
@@ -103,6 +99,19 @@ class ComplaintCard extends StatelessWidget {
             children: [
               Expanded(
                 child: CustomButton(
+                  onTap: (){
+                    showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        child:  ComplaintCardDetails( description: "Street light not working next to the school entrance...",
+    address: "San Francisco, CA, USA",
+    location: LatLng(37.7749, -122.4194),),
+      );
+    },
+  );
+                  },
                   height: buttonHeight,
                   title: 'View details',
                   fontSize: buttonFontSize,
@@ -112,6 +121,11 @@ class ComplaintCard extends StatelessWidget {
               SizedBox(width: spacing),
               Expanded(
                 child: CustomButton(
+                  onTap: (){
+          //           Navigator.of(context).push(
+          //   MaterialPageRoute(builder: (context) => ViewDocumentsPage()),
+          // );
+                  },
                   height: buttonHeight,
                   title: 'View documents',
                   fontSize: buttonFontSize,

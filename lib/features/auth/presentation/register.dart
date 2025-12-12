@@ -24,12 +24,15 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController middleNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController nationalNumberController = TextEditingController();
+  final TextEditingController nationalNumberController =
+      TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
-
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
+  String? _verifiedEmail;
+  String? _otpCode;
   double _getHorizontalPadding(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     if (width > 1200) return width * 0.25;
@@ -114,7 +117,8 @@ class _RegisterPageState extends State<RegisterPage> {
               keyboardType: TextInputType.text,
               maxLines: 1,
               textEditingController: firstNameController,
-              validator: (value) => value?.isEmpty ?? true ? 'First name is required' : null,
+              validator: (value) =>
+                  value?.isEmpty ?? true ? 'First name is required' : null,
               obscureText: false,
               showLabel: false,
               filled: false,
@@ -144,7 +148,8 @@ class _RegisterPageState extends State<RegisterPage> {
               keyboardType: TextInputType.text,
               maxLines: 1,
               textEditingController: lastNameController,
-              validator: (value) => value?.isEmpty ?? true ? 'Last name is required' : null,
+              validator: (value) =>
+                  value?.isEmpty ?? true ? 'Last name is required' : null,
               obscureText: false,
               showLabel: false,
               filled: false,
@@ -162,7 +167,8 @@ class _RegisterPageState extends State<RegisterPage> {
             keyboardType: TextInputType.text,
             maxLines: 1,
             textEditingController: firstNameController,
-            validator: (value) => value?.isEmpty ?? true ? 'First name is required' : null,
+            validator: (value) =>
+                value?.isEmpty ?? true ? 'First name is required' : null,
             obscureText: false,
             showLabel: false,
             filled: false,
@@ -188,7 +194,8 @@ class _RegisterPageState extends State<RegisterPage> {
             keyboardType: TextInputType.text,
             maxLines: 1,
             textEditingController: lastNameController,
-            validator: (value) => value?.isEmpty ?? true ? 'Last name is required' : null,
+            validator: (value) =>
+                value?.isEmpty ?? true ? 'Last name is required' : null,
             obscureText: false,
             showLabel: false,
             filled: false,
@@ -203,62 +210,145 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget _buildEmailRow(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
 
-    return Row(
-      children: [
-        Expanded(
-          flex: width > 600 ? 3 : 2,
-          child: TextFieldComponent(
-            hintText: 'example@gmail.com',
-            keyboardType: TextInputType.emailAddress,
-            maxLines: 1,
-            textEditingController: emailController,
-            validator: validateEmail,
-            obscureText: false,
-            showLabel: false,
-            filled: false,
-            withText: true,
-            title: width > 600 ? 'Email' : 'Enter your email',
-          ),
-        ),
-        SizedBox(width: width > 600 ? 16 : 10),
-        Expanded(
-          flex: width > 600 ? 2 : 1,
-          child: ElevatedButton(
-            onPressed: () {
-              if (emailController.text.isNotEmpty &&
-                  validateEmail(emailController.text) == null) {
-                _showOtpDialog(context);
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Enter a valid email first')),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              padding: const EdgeInsets.symmetric(vertical: 10),
+    return BlocListener<AuthCubit, AuthState>(
+      listener: (context, state) {
+        if (state.otpState == StateValue.success) {
+          // OTP sent successfully - show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.otpMessage),
+              backgroundColor: Colors.green,
             ),
-            child: const Text(
-              'Send code',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+          );
+        } else if (state.otpState == StateValue.error) {
+          // OTP sending failed
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.otpMessage),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                flex: width > 600 ? 3 : 2,
+                child: TextFieldComponent(
+                  hintText: 'example@gmail.com',
+                  keyboardType: TextInputType.emailAddress,
+                  maxLines: 1,
+                  textEditingController: emailController,
+                  validator: validateEmail,
+                  obscureText: false,
+                  showLabel: false,
+                  filled: false,
+                  withText: true,
+                  title: width > 600 ? 'Email' : 'Enter your email',
+                  onChanged: (value) {
+                    // Clear verification if email changes
+                    if (_verifiedEmail != null && _verifiedEmail != value) {
+                      setState(() {
+                        _verifiedEmail = null;
+                        _otpCode = null;
+                      });
+                    }
+                  },
+                ),
+              ),
+              SizedBox(width: width > 600 ? 16 : 10),
+              Expanded(
+                flex: width > 600 ? 2 : 1,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (emailController.text.isNotEmpty &&
+                        validateEmail(emailController.text) == null) {
+                      _showOtpDialog(context);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Enter a valid email first'),
+                        ),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                  child: _verifiedEmail == emailController.text
+                      ? const Icon(Icons.verified, color: Colors.white)
+                      : const Text(
+                          'Send code',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 8,
+          ), // Small spacing between field and verification status
+          // Show verification status
+          if (_verifiedEmail == emailController.text &&
+              emailController.text.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(left: 4.0),
+              child: Row(
+                children: [
+                  Icon(Icons.verified, color: Colors.green, size: 16),
+                  SizedBox(width: 8),
+                  Text(
+                    'Email verified',
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   void _showOtpDialog(BuildContext context) {
+    final email = emailController.text;
+
+    // Send OTP via AuthCubit
+    context.read<AuthCubit>().sendOtp(email);
+
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const OtpDialogContent(),
+      builder: (context) => OtpDialogContent(
+        email: email,
+        onVerified: (String code) {
+          // Store verified email and OTP code
+          setState(() {
+            _verifiedEmail = email;
+            _otpCode = code;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Email verified successfully!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        },
+      ),
     ).then((value) {
-      if (value != null) {
-        print("User entered code: $value");
+      // This runs when dialog is closed
+      if (value != null && value is String) {
+        print("User entered and verified code: $value");
       }
     });
   }
@@ -273,7 +363,10 @@ class _RegisterPageState extends State<RegisterPage> {
       listener: (context, state) {
         if (state.registerState == StateValue.success) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.registerMessage), backgroundColor: Colors.green),
+            SnackBar(
+              content: Text(state.registerMessage),
+              backgroundColor: Colors.green,
+            ),
           );
           Navigator.pushReplacement(
             context,
@@ -281,7 +374,10 @@ class _RegisterPageState extends State<RegisterPage> {
           );
         } else if (state.registerState == StateValue.error) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.registerMessage), backgroundColor: Colors.red),
+            SnackBar(
+              content: Text(state.registerMessage),
+              backgroundColor: Colors.red,
+            ),
           );
         }
       },
@@ -318,7 +414,9 @@ class _RegisterPageState extends State<RegisterPage> {
                               color: darkBrown,
                               fontSize: _getTitleFontSize(context),
                               fontWeight: FontWeight.bold,
-                              letterSpacing: platform == TargetPlatform.iOS ? -0.5 : 0.0,
+                              letterSpacing: platform == TargetPlatform.iOS
+                                  ? -0.5
+                                  : 0.0,
                             ),
                           ),
                         ),
@@ -329,7 +427,9 @@ class _RegisterPageState extends State<RegisterPage> {
                           keyboardType: TextInputType.number,
                           maxLines: 1,
                           textEditingController: nationalNumberController,
-                          validator: (value) => value?.isEmpty ?? true ? 'National number is required' : null,
+                          validator: (value) => value?.isEmpty ?? true
+                              ? 'National number is required'
+                              : null,
                           obscureText: false,
                           showLabel: false,
                           filled: false,
@@ -342,7 +442,9 @@ class _RegisterPageState extends State<RegisterPage> {
                           keyboardType: TextInputType.phone,
                           maxLines: 1,
                           textEditingController: phoneController,
-                          validator: (value) => value?.isEmpty ?? true ? 'Phone number is required' : null,
+                          validator: (value) => value?.isEmpty ?? true
+                              ? 'Phone number is required'
+                              : null,
                           obscureText: false,
                           showLabel: false,
                           filled: false,
@@ -371,8 +473,10 @@ class _RegisterPageState extends State<RegisterPage> {
                           maxLines: 1,
                           textEditingController: confirmPasswordController,
                           validator: (value) {
-                            if (confirmPasswordController.text.isEmpty) return 'Confirm password cannot be empty';
-                            if (value != passwordController.text) return 'Passwords do not match';
+                            if (confirmPasswordController.text.isEmpty)
+                              return 'Confirm password cannot be empty';
+                            if (value != passwordController.text)
+                              return 'Passwords do not match';
                             return null;
                           },
                           obscureText: true,
@@ -397,18 +501,55 @@ class _RegisterPageState extends State<RegisterPage> {
                               onTap: isLoading
                                   ? null
                                   : () {
-                                if (formKey.currentState!.validate()) {
-                                  context.read<AuthCubit>().register(
-                                    firstName: firstNameController.text.trim(),
-                                    middleName: middleNameController.text.trim(),
-                                    lastName: lastNameController.text.trim(),
-                                    nationalNumber: nationalNumberController.text.trim(),
-                                    phone: phoneController.text.trim(),
-                                    email: emailController.text.trim(),
-                                    password: passwordController.text.trim(),
-                                  );
-                                }
-                              },
+                                      // First check if email is verified
+                                      if (_verifiedEmail !=
+                                          emailController.text.trim()) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Please verify your email first by clicking "Send code" and entering the OTP',
+                                            ),
+                                            backgroundColor: Colors.orange,
+                                            duration: Duration(seconds: 3),
+                                          ),
+                                        );
+                                        return;
+                                      }
+
+                                      if (formKey.currentState!.validate()) {
+                                        context.read<AuthCubit>().register(
+                                          firstName: firstNameController.text
+                                              .trim(),
+                                          middleName: middleNameController.text
+                                              .trim(),
+                                          lastName: lastNameController.text
+                                              .trim(),
+                                          nationalNumber:
+                                              nationalNumberController.text
+                                                  .trim(),
+                                          phone: phoneController.text.trim(),
+                                          email: emailController.text.trim(),
+                                          password: passwordController.text
+                                              .trim(),
+                                          passwordConfirmation:
+                                              confirmPasswordController.text
+                                                  .trim(),
+                                        );
+                                        if (state.registerState ==
+                                            StateValue.success) {
+                                          Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  LoginPage(),
+                                            ),
+                                            (Route<dynamic> route) => false,
+                                          );
+                                        }
+                                      }
+                                    },
                             ),
                             if (isLoading)
                               const SizedBox(
@@ -421,7 +562,6 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                           ],
                         ),
-
                         SizedBox(height: isLargeScreen ? 60 : 50),
                         _buildLoginSection(context),
                       ],
@@ -445,20 +585,22 @@ class _RegisterPageState extends State<RegisterPage> {
           onTap: () => Navigator.pushReplacement(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) => const LoginPage(),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                final theme = Theme.of(context);
-                if (theme.platform == TargetPlatform.iOS) {
-                  return CupertinoPageTransition(
-                    primaryRouteAnimation: animation,
-                    secondaryRouteAnimation: secondaryAnimation,
-                    child: child,
-                    linearTransition: true,
-                  );
-                } else {
-                  return FadeTransition(opacity: animation, child: child);
-                }
-              },
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  const LoginPage(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    final theme = Theme.of(context);
+                    if (theme.platform == TargetPlatform.iOS) {
+                      return CupertinoPageTransition(
+                        primaryRouteAnimation: animation,
+                        secondaryRouteAnimation: secondaryAnimation,
+                        child: child,
+                        linearTransition: true,
+                      );
+                    } else {
+                      return FadeTransition(opacity: animation, child: child);
+                    }
+                  },
             ),
           ),
           child: MouseRegion(

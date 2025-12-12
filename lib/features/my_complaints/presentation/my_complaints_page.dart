@@ -12,7 +12,7 @@ class MyComplaintsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       initialIndex: 0,
-      length: 5,
+      length: 4,
       child: Scaffold(
         appBar: CustomAppBar(title: 'My complaints', icon: Icons.arrow_back),
         body: Column(
@@ -29,9 +29,9 @@ class MyComplaintsPage extends StatelessWidget {
               child: TabBarView(
                 children: [
                   _buildResponsiveComplaintList(context),
+                   _buildPlaceholderTab('New'),
                   _buildPlaceholderTab('In process'),
                   _buildPlaceholderTab('Rejected'),
-                  _buildPlaceholderTab('Info needed'),
                   _buildPlaceholderTab('Done'),
                 ],
               ),
@@ -88,7 +88,6 @@ class MyComplaintsPage extends StatelessWidget {
         Tab(text: 'New'),
         Tab(text: 'In process'),
         Tab(text: 'Rejected'),
-        Tab(text: 'Info needed'),
         Tab(text: 'Done'),
       ],
     );

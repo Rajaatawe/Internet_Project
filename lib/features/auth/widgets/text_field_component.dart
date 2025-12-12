@@ -18,7 +18,7 @@ class TextFieldComponent extends StatefulWidget {
     required this.maxLines,
      this.readOnly,
     required this.withText,
-     this.title, this.ontap,
+     this.title, this.ontap, this.onChanged,
   });
   final TextEditingController textEditingController;
   final bool obscureText;
@@ -35,6 +35,7 @@ class TextFieldComponent extends StatefulWidget {
   final bool withText;
   final String? title;
   final void Function()? ontap;
+  final ValueChanged<String>? onChanged;
   @override
   State<TextFieldComponent> createState() => _TextFieldComponentState();
 }
@@ -68,6 +69,7 @@ class _TextFieldComponentState extends State<TextFieldComponent> {
           showLabel: widget.showLabel,
           ontap: widget.ontap ?? null,
           readOnly: widget.readOnly ?? false,
+          onChanged: widget.onChanged ?? null,
         ),
       ],
     );

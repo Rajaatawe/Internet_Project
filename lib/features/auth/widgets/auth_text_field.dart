@@ -16,7 +16,7 @@ class AuthTextField extends StatefulWidget {
   final int maxLines;
   final bool readOnly;
   final void Function()? ontap;
-
+ ValueChanged<String>? onChanged;
   AuthTextField({
     super.key,
     required this.textEditingController,
@@ -30,7 +30,7 @@ class AuthTextField extends StatefulWidget {
     this.readOnly = false,
     this.fillColor,
     this.borderWidth = 1.0,
-    this.maxLines = 1,  this.ontap,
+    this.maxLines = 1,  this.ontap, this.onChanged,
   });
   @override
   State<AuthTextField> createState() => _AuthTextFieldState();
@@ -61,6 +61,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
         keyboardType: widget.keyboardType,
         maxLines: widget.maxLines,
 onTap: widget.ontap ?? null,
+onChanged: widget.onChanged,
         decoration: InputDecoration(
           floatingLabelBehavior: widget.showLabel
               ? FloatingLabelBehavior.auto
