@@ -1,21 +1,36 @@
 // File: complaint_card_details.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:internet_application_project/features/Form/presentation/maps_screen.dart';
+import 'package:internet_application_project/features/Form/widgets/place_picker_widget.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:internet_application_project/core/resources/colorfile.dart';
 import 'package:internet_application_project/core/resources/responsive_util.dart';
 
-class ComplaintCardDetails extends StatelessWidget {
+class ComplaintCardDetails extends StatefulWidget {
   final String description;
   final LatLng location;
   final String address; // Add address parameter
 
-  const ComplaintCardDetails({
+   ComplaintCardDetails({
     super.key,
     required this.description,
     required this.location,
     required this.address, // Add address parameter
   });
+
+  @override
+  State<ComplaintCardDetails> createState() => _ComplaintCardDetailsState();
+}
+
+class _ComplaintCardDetailsState extends State<ComplaintCardDetails> {
+ PickedData? pickedData;
+
+  MapController mapController = MapController();
+
+  var addressController = TextEditingController();
+
+  UniqueKey _mapKey = UniqueKey();
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +42,11 @@ class ComplaintCardDetails extends StatelessWidget {
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: EdgeInsets.all(
-        isMobile ? spacing * 1.5 : spacing * 2,
+        isMobile ? spacing * 0.4 : spacing * 2,
       ),
       child: Container(
         padding: EdgeInsets.all(
-          isMobile ? spacing * 1.5 : spacing * 2,
+          isMobile ? spacing * 0.4 : spacing * 2,
         ),
         decoration: BoxDecoration(
           color: whiteBrown,
@@ -89,7 +104,7 @@ class ComplaintCardDetails extends StatelessWidget {
             _dashedBox(
               context: context,
               height: isMobile ? font * 6 : font * 5,
-              text: description,
+              text: widget.description,
             ),
 
             SizedBox(height: spacing * 2),
@@ -104,88 +119,106 @@ class ComplaintCardDetails extends StatelessWidget {
             SizedBox(height: spacing),
 
             // Address display
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(spacing * 1.2),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(
-                  ResponsiveUtils.smallBorderRadius(context),
-                ),
-                border: Border.all(
-                  color: darkBrown.withOpacity(0.2),
-                ),
+          Column(
+  children: [
+    Container(
+      clipBehavior: Clip.hardEdge,
+      height: MediaQuery.of(context).size.height * 0.3,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Colors.blueGrey,
+          width: MediaQuery.of(context).size.height * 0.001,
+        ),
+      ),
+      child: Stack(
+        children: [
+          FlutterMap(
+            key: _mapKey,
+            mapController: mapController,
+            options: MapOptions(
+              interactiveFlags: InteractiveFlag.none, // يمنع السحب والتكبير والضغط
+              center: LatLng(
+                widget.location.latitude,
+                widget.location.longitude,
               ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.place,
-                    color: primaryColor,
-                    size: font * 1.1,
-                  ),
-                  SizedBox(width: spacing),
-                  Expanded(
-                    child: Text(
-                      address,
-                      style: TextStyle(
-                        fontSize: font * 0.9,
-                        color: darkBrown,
-                        height: 1.3,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
+              zoom: 17,
+              maxZoom: 19,
+              maxBounds: LatLngBounds(
+                LatLng(24.29200, 46.22700),
+                LatLng(25.09800, 47.20200),
               ),
             ),
+            children: [
+              TileLayer(
+                urlTemplate:
+                    "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                userAgentPackageName:
+                    'dev.fleaflet.flutter_map.example',
+              ),
+            ],
+          ),
 
-            SizedBox(height: spacing * 1.5),
+          const Positioned.fill(
+            child: IgnorePointer(
+              child: Center(
+                child: Icon(
+                  Icons.location_pin,
+                  size: 50,
+                  color: primaryColor,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
 
-            _mapBox(context),
+    SizedBox(height: spacing * 1.5),
 
-            // Coordinates display
-            Padding(
-              padding: EdgeInsets.only(top: spacing),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: spacing,
-                  vertical: spacing * 0.8,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.8),
-                  borderRadius: BorderRadius.circular(
-                    ResponsiveUtils.smallBorderRadius(context),
-                  ),
-                  border: Border.all(
-                    color: darkBrown.withOpacity(0.1),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.gps_fixed,
-                      size: font * 0.8,
-                      color: darkBrown.withOpacity(0.6),
-                    ),
-                    SizedBox(width: spacing * 0.5),
-                    Text(
-                      "Lat: ${location.latitude.toStringAsFixed(6)}, "
-                      "Lng: ${location.longitude.toStringAsFixed(6)}",
-                      style: TextStyle(
-                        fontSize: font * 0.75,
-                        color: darkBrown.withOpacity(0.7),
-                      ),
-                    ),
-                  ],
-                ),
+    // إظهار الإحداثيات فقط
+    Padding(
+      padding: EdgeInsets.only(top: spacing),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: spacing,
+          vertical: spacing * 0.8,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.8),
+          borderRadius: BorderRadius.circular(
+            ResponsiveUtils.smallBorderRadius(context),
+          ),
+          border: Border.all(
+            color: darkBrown.withOpacity(0.1),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.gps_fixed,
+              size: font * 0.8,
+              color: darkBrown.withOpacity(0.6),
+            ),
+            SizedBox(width: spacing * 0.5),
+            Text(
+              "Lat: ${widget.location.latitude.toStringAsFixed(6)}, "
+              "Lng: ${widget.location.longitude.toStringAsFixed(6)}",
+              style: TextStyle(
+                fontSize: font * 0.75,
+                color: darkBrown.withOpacity(0.7),
               ),
             ),
           ],
         ),
       ),
-    );
+    ),
+  ],
+)
+
+     ] ),
+    ));
   }
 
   // -------------------- Helper for section headers --------------------
@@ -300,7 +333,7 @@ class ComplaintCardDetails extends StatelessWidget {
             // Map
             FlutterMap(
               options: MapOptions(
-                center: location,
+                center: widget.location,
                 zoom: 14.0, // Slightly higher zoom for better view
                 interactiveFlags: InteractiveFlag.none, // Read-only
               ),
@@ -314,7 +347,7 @@ class ComplaintCardDetails extends StatelessWidget {
                 MarkerLayer(
                   markers: [
                     Marker(
-                      point: location,
+                      point: widget.location,
                       width: 60,
                       height: 60,
                       builder: (context) => Container(
