@@ -502,21 +502,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                   ? null
                                   : () {
                                       // First check if email is verified
-                                      if (_verifiedEmail !=
-                                          emailController.text.trim()) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                              'Please verify your email first by clicking "Send code" and entering the OTP',
-                                            ),
-                                            backgroundColor: Colors.orange,
-                                            duration: Duration(seconds: 3),
-                                          ),
-                                        );
-                                        return;
-                                      }
 
                                       if (formKey.currentState!.validate()) {
                                         context.read<AuthCubit>().register(

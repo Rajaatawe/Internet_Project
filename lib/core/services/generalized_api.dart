@@ -101,6 +101,69 @@ class RemoteService {
       );
     }
   }
+ Future<T> performAuthRequestRegisterOnly<T>(
+    String endpoint,
+    dynamic data,
+    T Function(Map<String, dynamic>) fromJson, {
+    bool useToken = false,
+    bool encrypt = false,
+    bool isResponseEncrypted = false,
+  }) async {
+    debugPrint('endpoints  is $endpoint');
+    debugPrint('data  is $data');
+
+    if (encrypt) {
+      debugPrint("encryption");
+    }
+    try {
+      FormData formData = FormData.fromMap(data);
+      final response = await dio.postUri(
+        Uri.parse(baseUrl + endpoint),
+        data: formData,
+        options: await _setOptions(useToken),
+      );
+      if (isResponseEncrypted) {
+        debugPrint("encrypted response");
+      }
+      debugPrint('response is $response');
+
+      /// if success
+      if (ErrorHandler.handleRemoteStatusCode(
+        response.statusCode!,
+        response.data,
+      )) {
+
+          final userMap = response.data["data"];
+          print(userMap);
+          print(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
+
+          print(userMap);
+
+          debugPrint("reached from json ");
+          final user = fromJson(userMap);
+          debugPrint("left from json ");
+
+          debugPrint("reached save user");
+          await appConstProvider.saveUser(userMap);
+          debugPrint("left save user ");
+
+          return user;
+
+      } else {
+        throw Exception("Error");
+      }
+    } catch (e) {
+      if (e is RemoteExceptions) rethrow;
+      if (e is DioError) throw ErrorHandler.handleDioError(e);
+
+      debugPrint(" App-level error: ${e.toString()}");
+      debugPrintStack();
+      throw RemoteExceptions(
+        ErrorCode.APP_ERROR,
+        ErrorCode.APP_ERROR.getLocalizedMessage(),
+      );
+    }
+  }
 
   Future<Response?> performVerifyTokenRequest(
     String endpoint, {

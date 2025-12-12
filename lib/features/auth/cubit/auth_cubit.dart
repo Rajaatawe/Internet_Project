@@ -68,7 +68,7 @@ class AuthCubit extends Cubit<AuthState> {
 
 
       };
-      await _remoteDatasource.performAuthRequest('register',data , User.fromJson);
+      await _remoteDatasource.performAuthRequestRegisterOnly('register',data , UserClass.fromJson);
       emit(state.copyWith(
         registerState: StateValue.success,
         registerMessage: "Register success",
