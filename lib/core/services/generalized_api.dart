@@ -426,6 +426,59 @@ class RemoteService {
     }
   }
 
+
+Future<void> performPostRequestNoRes(
+  String endpoint,
+  dynamic data, {
+  bool useToken = true,
+  bool encrypt = false,
+  bool isResponseEncrypted = false,
+}) async {
+  debugPrint('endpoints is $endpoint');
+  debugPrint('data is $data');
+
+  if (encrypt) {
+    debugPrint("encryption");
+  }
+  
+  try {
+    final response = await dio.postUri(
+      uri.resolve(baseUrl + endpoint),
+      data: data,
+      options: await _setOptions(useToken),
+    );
+
+    if (isResponseEncrypted) {
+      debugPrint("encrypted response");
+    }
+
+    debugPrint('response is $response');
+
+    if (ErrorHandler.handleRemoteStatusCode(
+      response.statusCode!,
+      response.data,
+    )) {
+      // You may want to handle the response data here if needed
+      // For example, logging or further processing
+      debugPrint('Processed data: ${response.data!["data"] ?? {}}');
+    } else {
+      throw Exception("Error");
+    }
+  } catch (e) {
+    if (e is RemoteExceptions) rethrow;
+    if (e is DioError) throw ErrorHandler.handleDioError(e);
+
+    debugPrint("App-level error: ${e.toString()}");
+    debugPrintStack();
+    throw RemoteExceptions(
+      ErrorCode.APP_ERROR,
+      ErrorCode.APP_ERROR.getLocalizedMessage(),
+    );
+  }
+}
+
+
+
   Future<T> performPostRequestWithFormData<T>(
     String endpoint,
     dynamic data,
