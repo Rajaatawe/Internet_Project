@@ -29,7 +29,7 @@ class MyComplaintsPage extends StatelessWidget {
               child: TabBarView(
                 children: [
                   _buildResponsiveComplaintList(context),
-                   _buildPlaceholderTab('New'),
+                  //  _buildPlaceholderTab('New'),
                   _buildPlaceholderTab('In process'),
                   _buildPlaceholderTab('Rejected'),
                   _buildPlaceholderTab('Done'),

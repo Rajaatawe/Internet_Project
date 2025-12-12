@@ -1,10 +1,11 @@
 import 'package:equatable/equatable.dart';
+import 'package:internet_application_project/core/models/GovernmentAgency.dart';
 import '../../../core/models/enum/states_enum.dart';
 import '../../../core/models/Service.dart';
 
 class HomePageState extends Equatable {
   final StateValue state;
-  final List<Service> governmentAgencies;
+  final List<GovernmentAgencyclass> governmentAgencies;
   final String message;
 
   const HomePageState({
@@ -15,7 +16,7 @@ class HomePageState extends Equatable {
 
   HomePageState copyWith({
     StateValue? state,
-    List<Service>? governmentAgencies,
+    List<GovernmentAgencyclass>? governmentAgencies,
     String? message,
   }) {
     return HomePageState(

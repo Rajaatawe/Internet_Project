@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:internet_application_project/core/config/app_configt.dart';
 import 'package:internet_application_project/core/services/generalized_api.dart';
+import 'package:internet_application_project/features/home_page/presentation/home_page.dart';
 
 import 'package:internet_application_project/features/notification_page/NotificationService.dart';
 import 'package:provider/provider.dart';
@@ -92,7 +93,7 @@ class _MyAppState extends State<MyApp> {
       child: MaterialApp(
         theme: ThemeData(fontFamily: 'Outfit'),
         debugShowCheckedModeBanner: false,
-        home: const LoginPage(),
+        home: const HomePage(),
       ),
     );
   }

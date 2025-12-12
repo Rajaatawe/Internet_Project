@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:internet_application_project/core/config/app_configt.dart';
 import 'package:internet_application_project/core/constants/app_assets.dart';
-import 'package:internet_application_project/core/models/Service.dart';
+import 'package:internet_application_project/core/models/GovernmentAgency.dart';
 import 'package:internet_application_project/core/models/enum/states_enum.dart';
 import 'package:internet_application_project/core/resources/colorfile.dart';
 import 'package:internet_application_project/core/resources/responsive_util.dart';
 import 'package:internet_application_project/core/services/generalized_api.dart';
-import 'package:internet_application_project/core/services/service_locator.dart';
 import 'package:internet_application_project/core/widgets/custom_button.dart';
+import 'package:internet_application_project/features/Form/presentation/preview.dart';
 import 'package:internet_application_project/features/home_page/cubit/home_page_cubit.dart';
 import 'package:internet_application_project/features/home_page/cubit/home_page_state.dart';
 import 'package:internet_application_project/features/my_complaints/presentation/my_complaints_page.dart';
@@ -30,9 +30,7 @@ class HomePage extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    SizedBox(
-                      height: ResponsiveUtils.largeSpacing(context),
-                    ),
+                    SizedBox(height: ResponsiveUtils.largeSpacing(context)),
 
                     _buildTitle(context),
 
@@ -111,9 +109,9 @@ class HomePage extends StatelessWidget {
 
   Widget _buildAgencyGridWithBloc() {
     return BlocProvider(
-      create: (context) => HomePageCubit(
-        remoteService: RemoteService.getInstance(AppConst()),
-      )..loadHomePage(),
+      create: (context) =>
+          HomePageCubit(remoteService: RemoteService.getInstance(AppConst()))
+            ..loadHomePage(),
       child: _AgencyGridBlocWrapper(),
     );
   }
@@ -142,12 +140,38 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class _AgencyGridBlocWrapper extends StatelessWidget {
+class _AgencyGridBlocWrapper extends StatefulWidget {
+  @override
+  State<_AgencyGridBlocWrapper> createState() => _AgencyGridBlocWrapperState();
+}
+
+class _AgencyGridBlocWrapperState extends State<_AgencyGridBlocWrapper> {
+  @override
+  void initState() {
+    super.initState();
+    BlocProvider.of<HomePageCubit>(context).loadHomePage();
+    print('//////////////////////////////////////////////////////////////');
+    print(
+      "home page perfectoooooooooooooooooooooooooooooooooooooooooooooooooooo",
+    );
+    print('//////////////////////////////////////////////////////////////');
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HomePageCubit, HomePageState>(
+    return BlocConsumer<HomePageCubit, HomePageState>(
+      buildWhen: (previous, current) => current.state != previous.state,
+      listenWhen: (previous, current) => current.state != previous.state,
+      listener: (context, state) {
+        if (state.state == StateValue.loaded) {
+          print("print success Homepage");
+        } else if (state.state == StateValue.error) {
+          print(
+            "///////////////////////////////////////////////Error Home page",
+          );
+        }
+      },
       builder: (context, state) {
-        // Loading state
         if (state.state == StateValue.loading) {
           return SizedBox(
             height: ResponsiveUtils.heightPercentage(context, 0.56),
@@ -196,17 +220,17 @@ class _AgencyGridBlocWrapper extends StatelessWidget {
     );
   }
 
-  Widget _buildAgencyGrid(BuildContext context, List<Service> agencies) {
+  Widget _buildAgencyGrid(
+    BuildContext context,
+    List<GovernmentAgencyclass> agencies,
+  ) {
     if (agencies.isEmpty) {
       return SizedBox(
         height: ResponsiveUtils.heightPercentage(context, 0.56),
         child: Center(
           child: Text(
             'No government agencies found',
-            style: TextStyle(
-              color: Colors.grey,
-              fontSize: 16,
-            ),
+            style: TextStyle(color: Colors.grey, fontSize: 16),
           ),
         ),
       );
@@ -227,7 +251,12 @@ class _AgencyGridBlocWrapper extends StatelessWidget {
           itemCount: agencies.length,
           itemBuilder: (BuildContext context, int index) {
             final agency = agencies[index];
-            return GovernmentAgencyCardItem(service: agency);
+            return GestureDetector(
+              onTap: () => Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (context) => Preview())),
+              child: GovernmentAgencyCardItem(governmentAgency: agency),
+            );
           },
         ),
       ),
@@ -236,12 +265,9 @@ class _AgencyGridBlocWrapper extends StatelessWidget {
 }
 
 class GovernmentAgencyCardItem extends StatelessWidget {
-  const GovernmentAgencyCardItem({
-    super.key,
-    required this.service,
-  });
+  const GovernmentAgencyCardItem({super.key, required this.governmentAgency});
 
-  final Service service;
+  final GovernmentAgencyclass governmentAgency;
 
   @override
   Widget build(BuildContext context) {
@@ -264,13 +290,13 @@ class GovernmentAgencyCardItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                _getIconForService(service),
+                _getIconForAgency(governmentAgency),
                 color: primaryColor,
                 size: _getIconSize(context),
               ),
               SizedBox(height: ResponsiveUtils.smallSpacing(context)),
               Text(
-                'service.name',
+                governmentAgency.agencyName,
                 textAlign: TextAlign.center,
                 style: ResponsiveUtils.adaptiveBodyStyle(context).copyWith(
                   color: primaryColor,
@@ -285,35 +311,47 @@ class GovernmentAgencyCardItem extends StatelessWidget {
     );
   }
 
-  IconData _getIconForService(Service service) {
-    final serviceName = 'service.name.toLowerCase();';
-    
-    // Map service names to appropriate icons
-    if (serviceName.contains('water')) return Icons.water_drop;
-    if (serviceName.contains('electric') || serviceName.contains('power')) return Icons.electric_bolt;
-    if (serviceName.contains('gas')) return Icons.gas_meter;
-    if (serviceName.contains('health') || serviceName.contains('hospital') || serviceName.contains('medical')) 
+  IconData _getIconForAgency(GovernmentAgencyclass governmentAgency) {
+    final agencyname = governmentAgency.agencyName.toLowerCase();
+
+    if (agencyname.contains('water')) return Icons.water_drop;
+    if (agencyname.contains('electric') || agencyname.contains('power'))
+      return Icons.electric_bolt;
+    if (agencyname.contains('gas')) return Icons.gas_meter;
+    if (agencyname.contains('health') ||
+        agencyname.contains('hospital') ||
+        agencyname.contains('medical'))
       return Icons.medical_services;
-    if (serviceName.contains('education') || serviceName.contains('school') || serviceName.contains('university')) 
+    if (agencyname.contains('education') ||
+        agencyname.contains('school') ||
+        agencyname.contains('university'))
       return Icons.school;
-    if (serviceName.contains('transport') || serviceName.contains('bus') || serviceName.contains('traffic')) 
+    if (agencyname.contains('transport') ||
+        agencyname.contains('bus') ||
+        agencyname.contains('traffic'))
       return Icons.directions_bus;
-    if (serviceName.contains('police') || serviceName.contains('security')) 
+    if (agencyname.contains('police') || agencyname.contains('security'))
       return Icons.local_police;
-    if (serviceName.contains('fire')) return Icons.local_fire_department;
-    if (serviceName.contains('waste') || serviceName.contains('garbage')) 
+    if (agencyname.contains('fire')) return Icons.local_fire_department;
+    if (agencyname.contains('waste') || agencyname.contains('garbage'))
       return Icons.delete;
-    if (serviceName.contains('telecom') || serviceName.contains('phone') || serviceName.contains('communication')) 
+    if (agencyname.contains('telecom') ||
+        agencyname.contains('phone') ||
+        agencyname.contains('communication'))
       return Icons.phone;
-    if (serviceName.contains('internet') || serviceName.contains('wifi') || serviceName.contains('broadband')) 
+    if (agencyname.contains('internet') ||
+        agencyname.contains('wifi') ||
+        agencyname.contains('broadband'))
       return Icons.wifi;
-    if (serviceName.contains('road') || serviceName.contains('highway') || serviceName.contains('infrastructure')) 
+    if (agencyname.contains('road') ||
+        agencyname.contains('highway') ||
+        agencyname.contains('infrastructure'))
       return Icons.streetview;
-    if (serviceName.contains('tax') || serviceName.contains('revenue')) 
+    if (agencyname.contains('tax') || agencyname.contains('revenue'))
       return Icons.attach_money;
-    if (serviceName.contains('immigration') || serviceName.contains('passport')) 
+    if (agencyname.contains('immigration') || agencyname.contains('passport'))
       return Icons.airplanemode_active;
-    
+
     return Icons.business; // Default icon for government agencies
   }
 

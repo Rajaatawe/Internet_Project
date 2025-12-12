@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:internet_application_project/core/models/GovernmentAgency.dart';
 import 'package:internet_application_project/core/network/error_handling/error_code.dart';
 import 'package:internet_application_project/core/models/Service.dart';
 import 'package:internet_application_project/core/models/enum/states_enum.dart';
@@ -18,10 +19,10 @@ class HomePageCubit extends Cubit<HomePageState> {
 
     try {
       final governmentAgencies =
-          await _remoteService.performGetListRequest<Service>(
-        "/services",
-        (json) => Service.fromJson(json),
-        useToken: false,
+          await _remoteService.performGetListRequest<GovernmentAgencyclass>(
+        "agencies",
+        (json) => GovernmentAgencyclass.fromJson(json),
+        useToken: true,
         isResponseEncrypted: false,
       );
 

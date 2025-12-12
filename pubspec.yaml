@@ -53,6 +53,9 @@ dependencies:
   flutter_local_notifications: ^18.0.1
   flutter_bloc: ^9.1.1
   provider: ^6.1.5+1
+  photo_view: ^0.15.0
+  chewie: ^1.13.0
+  open_filex: ^4.7.0
   
 dev_dependencies:
   flutter_test:

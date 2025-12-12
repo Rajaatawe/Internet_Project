@@ -61,12 +61,12 @@ class RemoteService {
       if (ErrorHandler.handleRemoteStatusCode(
           response.statusCode!, response.data)) {
          
-        final userMap = response.data["message"]["user"];
+        final userMap = response.data["data"]["user"];
          print(userMap);
         print(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
            print('object1');
 
-        final token = response.data["message"]["token"];
+        final token = response.data["data"]["token"];
         print('object2');
 
  print(userMap);
@@ -595,7 +595,8 @@ debugPrint("reached save user");
         sendTimeout: const Duration(seconds: 60),
         receiveTimeout: const Duration(seconds: 60));
     if (useToken) {
-      String? token = await _getToken();
+      // String? token = await _getToken();
+      String ? token = "3|E7fVzs2ZbrZIBUtDQy0ZCYZN7lQQIHbiwaqv3gVFa8458c3b";
       // if (token == null) {
       //   throw const RemoteExceptions(
       //       ErrorCode.USER_DATA_NOT_FOUND, 'not logged in');
