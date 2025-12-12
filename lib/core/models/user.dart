@@ -51,18 +51,17 @@ class Message {
 
 class UserClass {
   final int id;
-  final String firstName;
+  final String? firstName;
   final String? middleName; // يمكن أن تكون null
-  final String lastName;
-  final String phone;
-  final String email;
-  final String identityNumber;
+  final String? lastName;
+  final String? phone;
+  final String ?email;
+  final String ?identityNumber;
   final bool isActive;
   final DateTime lastLoginAt;
   final int? governmentAgencyId; // يمكن أن تكون null
   final DateTime? emailVerifiedAt; // يمكن أن تكون null
-  final DateTime createdAt;
-  final DateTime updatedAt;
+
 
   UserClass({
     required this.id,
@@ -76,8 +75,7 @@ class UserClass {
     required this.lastLoginAt,
     this.governmentAgencyId, // يمكن أن تكون null
     this.emailVerifiedAt, // يمكن أن تكون null
-    required this.createdAt,
-    required this.updatedAt,
+
   });
 
   factory UserClass.fromJson(Map<String, dynamic> json) => UserClass(
@@ -92,8 +90,7 @@ class UserClass {
     lastLoginAt: DateTime.parse(json["last_login_at"]),
     governmentAgencyId: json["government_agency_id"], // يمكن أن تكون null
     emailVerifiedAt: json["email_verified_at"] != null ? DateTime.parse(json["email_verified_at"]) : null, // يمكن أن تكون null
-    createdAt: DateTime.parse(json["created_at"]),
-    updatedAt: DateTime.parse(json["updated_at"]),
+  
   );
 
   Map<String, dynamic> toJson() => {
@@ -108,7 +105,6 @@ class UserClass {
     "last_login_at": lastLoginAt.toIso8601String(),
     "government_agency_id": governmentAgencyId, // يمكن أن تكون null
     "email_verified_at": emailVerifiedAt?.toIso8601String(), // يمكن أن تكون null
-    "created_at": createdAt.toIso8601String(),
-    "updated_at": updatedAt.toIso8601String(),
+
   };
 }
