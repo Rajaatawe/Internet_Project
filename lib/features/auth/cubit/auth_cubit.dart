@@ -87,7 +87,7 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> sendOtp(String email) async {
     emit(state.copyWith(otpState: StateValue.loading));
     try {
-    await _remoteDatasource.performPostRequest("send-otp",{'email':email},(map){}, useToken: false);
+    await _remoteDatasource.performPostRequestNoRes("send-otp",{'email':email}, useToken: false);
       emit(state.copyWith(
         otpState: StateValue.success,
         otpMessage: "OTP sent",
@@ -106,7 +106,7 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> verifyOtp(String code, String email) async {
     emit(state.copyWith(verifyOtpState: StateValue.loading));
     try {
-await _remoteDatasource.performPostRequest("verify-otp",{'otp':code ,'email':email}, (map){}, useToken: false);
+await _remoteDatasource.performPostRequestNoRes("verify-otp",{'otp':code ,'email':email}, useToken: false);
       emit(state.copyWith(
         verifyOtpState: StateValue.success,
         verifyOtpMessage: "OTP verified",

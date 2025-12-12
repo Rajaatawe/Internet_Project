@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:internet_application_project/core/models/enum/states_enum.dart';
 import 'package:internet_application_project/core/resources/colorfile.dart';
 import 'package:internet_application_project/core/resources/responsive_util.dart';
 import 'package:internet_application_project/core/widgets/customAppBar.dart';
 import 'package:internet_application_project/core/widgets/custom_button.dart';
+import 'package:internet_application_project/features/auth/cubit/auth_cubit.dart';
+import 'package:internet_application_project/features/auth/cubit/auth_state.dart';
+import 'package:internet_application_project/features/auth/presentation/login_page.dart';
 import 'package:internet_application_project/features/settings/widgets/item_settings_row.dart';
 import 'package:internet_application_project/features/settings/widgets/title_settings_rows.dart';
 
@@ -22,20 +27,19 @@ class _SettingsPageState extends State<SettingsPage> {
       appBar: CustomAppBar(title: 'Settings', icon: Icons.arrow_back),
       body: SingleChildScrollView(
         child: Padding(
-          padding: ResponsiveUtils.contentPadding(context)*0.00001,
+          padding: ResponsiveUtils.contentPadding(context) * 0.00001,
           child: Column(
             children: [
               // SizedBox(height: ResponsiveUtils.mediumSpacing(context)),
-              
               _buildGeneralSection(),
               SizedBox(height: ResponsiveUtils.largeSpacing(context)),
-              
+
               _buildAccountSection(),
               SizedBox(height: ResponsiveUtils.largeSpacing(context)),
-              
+
               _buildInfoSection(),
               SizedBox(height: ResponsiveUtils.extraLargeSpacing(context)),
-              
+
               _buildLogoutButton(context),
               SizedBox(height: ResponsiveUtils.largeSpacing(context)),
             ],
@@ -51,7 +55,7 @@ class _SettingsPageState extends State<SettingsPage> {
       children: [
         TitleSettingsRows(title: 'General'),
         SizedBox(height: ResponsiveUtils.smallSpacing(context)),
-        
+
         ItemSettingsRow(
           title: 'Theme',
           icon: Icons.brightness_6,
@@ -63,9 +67,9 @@ class _SettingsPageState extends State<SettingsPage> {
             inactiveTrackColor: Colors.grey.withOpacity(0.3),
           ),
         ),
-        
+
         SizedBox(height: ResponsiveUtils.smallSpacing(context) * 0.7),
-        
+
         ItemSettingsRow(
           title: 'Language',
           icon: Icons.language,
@@ -77,7 +81,9 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             decoration: BoxDecoration(
               color: const Color(0xffd6c1b5),
-              borderRadius: BorderRadius.circular(ResponsiveUtils.smallBorderRadius(context)),
+              borderRadius: BorderRadius.circular(
+                ResponsiveUtils.smallBorderRadius(context),
+              ),
               border: Border.all(color: const Color(0xffa68e7b), width: 1.2),
             ),
             child: DropdownButtonHideUnderline(
@@ -90,7 +96,9 @@ class _SettingsPageState extends State<SettingsPage> {
                       color: const Color(0xff6a4d38),
                       size: ResponsiveUtils.smallIconSize(context),
                     ),
-                    SizedBox(width: ResponsiveUtils.smallSpacing(context) * 0.5),
+                    SizedBox(
+                      width: ResponsiveUtils.smallSpacing(context) * 0.5,
+                    ),
                     Text(
                       "change language",
                       style: TextStyle(
@@ -111,7 +119,9 @@ class _SettingsPageState extends State<SettingsPage> {
                           color: const Color(0xff6a4d38),
                           size: ResponsiveUtils.smallIconSize(context),
                         ),
-                        SizedBox(width: ResponsiveUtils.smallSpacing(context) * 0.5),
+                        SizedBox(
+                          width: ResponsiveUtils.smallSpacing(context) * 0.5,
+                        ),
                         Text(
                           lang,
                           style: TextStyle(
@@ -125,7 +135,9 @@ class _SettingsPageState extends State<SettingsPage> {
                   }).toList();
                 },
                 dropdownColor: const Color(0xfff3e8e2),
-                borderRadius: BorderRadius.circular(ResponsiveUtils.smallBorderRadius(context)),
+                borderRadius: BorderRadius.circular(
+                  ResponsiveUtils.smallBorderRadius(context),
+                ),
                 items: const [
                   DropdownMenuItem(
                     value: "English",
@@ -167,7 +179,7 @@ class _SettingsPageState extends State<SettingsPage> {
       children: [
         TitleSettingsRows(title: 'Account'),
         SizedBox(height: ResponsiveUtils.smallSpacing(context)),
-        
+
         ItemSettingsRow(
           title: 'Full Name',
           icon: Icons.person_2_outlined,
@@ -180,9 +192,9 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
         ),
-        
+
         SizedBox(height: ResponsiveUtils.smallSpacing(context) * 0.7),
-        
+
         ItemSettingsRow(
           title: 'Email',
           icon: Icons.email,
@@ -205,24 +217,24 @@ class _SettingsPageState extends State<SettingsPage> {
       children: [
         TitleSettingsRows(title: 'Info'),
         SizedBox(height: ResponsiveUtils.smallSpacing(context)),
-        
+
         ItemSettingsRow(
           title: 'About',
           icon: Icons.info_outline,
           prefixWidget: Icon(
-            Icons.arrow_forward_ios, 
+            Icons.arrow_forward_ios,
             color: primaryColor,
             size: ResponsiveUtils.smallIconSize(context),
           ),
         ),
-        
+
         SizedBox(height: ResponsiveUtils.smallSpacing(context) * 0.7),
-        
+
         ItemSettingsRow(
           title: 'Policy',
           icon: Icons.policy,
           prefixWidget: Icon(
-            Icons.arrow_forward_ios, 
+            Icons.arrow_forward_ios,
             color: primaryColor,
             size: ResponsiveUtils.smallIconSize(context),
           ),
@@ -262,7 +274,9 @@ class _SettingsPageState extends State<SettingsPage> {
           padding: EdgeInsets.all(ResponsiveUtils.largeSpacing(context)),
           decoration: BoxDecoration(
             color: const Color(0xfffdf6f4),
-            borderRadius: BorderRadius.circular(ResponsiveUtils.largeBorderRadius(context)),
+            borderRadius: BorderRadius.circular(
+              ResponsiveUtils.largeBorderRadius(context),
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.08),
@@ -302,14 +316,14 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _buildDialogButtons(BuildContext context) {
     final isMobile = ResponsiveUtils.isMobile(context);
-    
+
     if (isMobile) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           CustomButton(
-             height: ResponsiveUtils.buttonHeight(context) * 0.8, 
-          width: ResponsiveUtils.buttonWidth(context, mobileRatio: 0.5)*0.6,
+            height: ResponsiveUtils.buttonHeight(context) * 0.8,
+            width: ResponsiveUtils.buttonWidth(context, mobileRatio: 0.5) * 0.6,
             title: 'confirm',
             titleColor: Colors.white,
             backgroundColor: Colors.red,
@@ -320,8 +334,8 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           SizedBox(height: ResponsiveUtils.smallSpacing(context)),
           CustomButton(
-             height: ResponsiveUtils.buttonHeight(context) * 0.8, 
-          width: ResponsiveUtils.buttonWidth(context, mobileRatio: 0.5)*0.6,
+            height: ResponsiveUtils.buttonHeight(context) * 0.8,
+            width: ResponsiveUtils.buttonWidth(context, mobileRatio: 0.5) * 0.6,
             title: 'cancel',
             titleColor: const Color(0xff5a4638),
             backgroundColor: const Color(0xffe9e4df),
@@ -333,20 +347,38 @@ class _SettingsPageState extends State<SettingsPage> {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          CustomButton(
-            height: ResponsiveUtils.buttonHeight(context),
-            width: ResponsiveUtils.buttonWidth(context, tabletRatio: 0.25, desktopRatio: 0.2),
-            title: 'confirm',
-            titleColor: Colors.white,
-            backgroundColor: Colors.red,
-            onTap: () {
-              Navigator.pop(context);
-              // TODO: add logout logic here
+          BlocListener<AuthCubit, AuthState>(
+            listener: (context, state) {
+              if(state.logoutState == StateValue.loading){
+                  context.read<AuthCubit>().logout();
+              }
+              else if(state.logoutState == StateValue.success){
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => LoginPage()),
+              (Route<dynamic> route) => false, // This will remove all routes
+            );
+              }
             },
+            child: CustomButton(
+              height: ResponsiveUtils.buttonHeight(context),
+              width: ResponsiveUtils.buttonWidth(
+                context,
+                tabletRatio: 0.25,
+                desktopRatio: 0.2,
+              ),
+              title: 'confirm',
+              titleColor: Colors.white,
+              backgroundColor: Colors.red,
+              onTap: () {},
+            ),
           ),
           CustomButton(
             height: ResponsiveUtils.buttonHeight(context),
-            width: ResponsiveUtils.buttonWidth(context, tabletRatio: 0.25, desktopRatio: 0.2),
+            width: ResponsiveUtils.buttonWidth(
+              context,
+              tabletRatio: 0.25,
+              desktopRatio: 0.2,
+            ),
             title: 'cancel',
             titleColor: const Color(0xff5a4638),
             backgroundColor: const Color(0xffe9e4df),

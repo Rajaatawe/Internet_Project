@@ -10,7 +10,7 @@ import 'package:internet_application_project/features/home_page/presentation/hom
 import 'package:latlong2/latlong.dart';
 
 class Preview extends StatefulWidget {
-  const   Preview({super.key});
+  const Preview({super.key});
 
   @override
   State<Preview> createState() => _PreviewState();

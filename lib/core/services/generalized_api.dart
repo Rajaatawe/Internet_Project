@@ -52,41 +52,40 @@ class RemoteService {
       );
       if (isResponseEncrypted) {
         debugPrint("encrypted response");
-                print(",ظظظظظظظظظظظظظظظظظظظظظظظظظظظظظظظظظظ,,,,,,,,,,,,,");
-
       }
       debugPrint('response is $response');
 
       /// if success
       if (ErrorHandler.handleRemoteStatusCode(
-          response.statusCode!, response.data)) {
-         
-        final userMap = response.data["data"]["user"];
-         print(userMap);
-        print(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
-           print('object1');
+        response.statusCode!,
+        response.data,
+      )) {
 
-        final token = response.data["data"]["token"];
-        print('object2');
+          final userMap = response.data["data"]["user"];
+          print(userMap);
+          print(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
+          print('object1');
+          final token = response.data["data"]["token"];
+          print('object2');
 
- print(userMap);
+          print(userMap);
 
-debugPrint("reached from json ");
-        final user = fromJson(userMap);
-        debugPrint("left from json ");
-   
+          debugPrint("reached from json ");
+          final user = fromJson(userMap);
+          debugPrint("left from json ");
 
-debugPrint("reached save user");
-        await appConstProvider.saveUser(userMap);
-        debugPrint("left save user ");
+          debugPrint("reached save user");
+          await appConstProvider.saveUser(userMap);
+          debugPrint("left save user ");
 
-        if (token != null) {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString("token", token);
-          _cachedToken = token;
-        }
+          if (token != null) {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setString("token", token);
+            _cachedToken = token;
+          }
 
-        return user;
+          return user;
+
       } else {
         throw Exception("Error");
       }
@@ -97,10 +96,11 @@ debugPrint("reached save user");
       debugPrint(" App-level error: ${e.toString()}");
       debugPrintStack();
       throw RemoteExceptions(
-          ErrorCode.APP_ERROR, ErrorCode.APP_ERROR.getLocalizedMessage());
+        ErrorCode.APP_ERROR,
+        ErrorCode.APP_ERROR.getLocalizedMessage(),
+      );
     }
   }
-
 
   Future<Response?> performVerifyTokenRequest(
     String endpoint, {
@@ -136,7 +136,9 @@ debugPrint("reached save user");
       debugPrint(" App-level error: ${e.toString()}");
       debugPrintStack();
       throw RemoteExceptions(
-          ErrorCode.APP_ERROR, ErrorCode.APP_ERROR.getLocalizedMessage());
+        ErrorCode.APP_ERROR,
+        ErrorCode.APP_ERROR.getLocalizedMessage(),
+      );
     }
   }
 
@@ -165,7 +167,9 @@ debugPrint("reached save user");
       debugPrint('response is $response');
 
       if (ErrorHandler.handleRemoteStatusCode(
-          response.statusCode!, response.data)) {
+        response.statusCode!,
+        response.data,
+      )) {
         await appConstProvider.removeUser();
         await appConstProvider.setIsLoggedIn(false);
         _cachedToken = null;
@@ -179,7 +183,9 @@ debugPrint("reached save user");
       debugPrint(" App-level error: ${e.toString()}");
       debugPrintStack();
       throw RemoteExceptions(
-          ErrorCode.APP_ERROR, ErrorCode.APP_ERROR.getLocalizedMessage());
+        ErrorCode.APP_ERROR,
+        ErrorCode.APP_ERROR.getLocalizedMessage(),
+      );
     }
   }
 
@@ -206,7 +212,9 @@ debugPrint("reached save user");
       }
       debugPrint('response is $response');
       if (ErrorHandler.handleRemoteStatusCode(
-          response.statusCode!, response.data)) {
+        response.statusCode!,
+        response.data,
+      )) {
         await appConstProvider.removeUser();
         await appConstProvider.setIsLoggedIn(false);
         _cachedToken = null;
@@ -220,10 +228,11 @@ debugPrint("reached save user");
       debugPrint(" App-level error: ${e.toString()}");
       debugPrintStack();
       throw RemoteExceptions(
-          ErrorCode.APP_ERROR, ErrorCode.APP_ERROR.getLocalizedMessage());
+        ErrorCode.APP_ERROR,
+        ErrorCode.APP_ERROR.getLocalizedMessage(),
+      );
     }
   }
-
 
   ///////////////// GET /////////////////
 
@@ -244,7 +253,9 @@ debugPrint("reached save user");
       }
       debugPrint('response is $response');
       if (ErrorHandler.handleRemoteStatusCode(
-          response.statusCode!, response.data)) {
+        response.statusCode!,
+        response.data,
+      )) {
         return fromMap(response.data!["data"]);
       } else {
         throw Exception("Error");
@@ -256,7 +267,9 @@ debugPrint("reached save user");
       debugPrint(" App-level error: ${e.toString()}");
       debugPrintStack();
       throw RemoteExceptions(
-          ErrorCode.APP_ERROR, ErrorCode.APP_ERROR.getLocalizedMessage());
+        ErrorCode.APP_ERROR,
+        ErrorCode.APP_ERROR.getLocalizedMessage(),
+      );
     }
   }
 
@@ -267,7 +280,6 @@ debugPrint("reached save user");
     bool isResponseEncrypted = false,
     String? keyWord,
   }) async {
-
     debugPrint('endpoints  is $endpoint');
 
     try {
@@ -280,7 +292,9 @@ debugPrint("reached save user");
       }
       debugPrint('response is $response');
       if (ErrorHandler.handleRemoteStatusCode(
-          response.statusCode!, response.data)) {
+        response.statusCode!,
+        response.data,
+      )) {
         List<T> result = [];
 
         final dataList = keyWord == null
@@ -301,7 +315,9 @@ debugPrint("reached save user");
       debugPrint(" App-level error: ${e.toString()}");
       debugPrintStack();
       throw RemoteExceptions(
-          ErrorCode.APP_ERROR, ErrorCode.APP_ERROR.getLocalizedMessage());
+        ErrorCode.APP_ERROR,
+        ErrorCode.APP_ERROR.getLocalizedMessage(),
+      );
     }
   }
 
@@ -312,7 +328,6 @@ debugPrint("reached save user");
     bool isResponseEncrypted = false,
     String? keyWord,
   }) async {
-
     debugPrint('endpoints  is $endpoint');
 
     try {
@@ -328,7 +343,9 @@ debugPrint("reached save user");
       debugPrint('response is $response');
 
       if (ErrorHandler.handleRemoteStatusCode(
-          response.statusCode!, response.data)) {
+        response.statusCode!,
+        response.data,
+      )) {
         List<T> result = [];
 
         final rawList = response.data["data"];
@@ -336,8 +353,8 @@ debugPrint("reached save user");
         final dataSource = keyWord != null
             ? rawList[keyWord]
             : (rawList is Map<String, dynamic> && rawList["data"] is List
-                ? rawList["data"]
-                : rawList);
+                  ? rawList["data"]
+                  : rawList);
 
         for (var element in dataSource) {
           result.add(fromMap(element));
@@ -354,13 +371,13 @@ debugPrint("reached save user");
       debugPrint(" App-level error: ${e.toString()}");
       debugPrintStack();
       throw RemoteExceptions(
-          ErrorCode.APP_ERROR, ErrorCode.APP_ERROR.getLocalizedMessage());
+        ErrorCode.APP_ERROR,
+        ErrorCode.APP_ERROR.getLocalizedMessage(),
+      );
     }
   }
 
   ///////////////// POST /////////////////
-
-
 
   Future<T> performPostRequest<T>(
     String endpoint,
@@ -370,7 +387,6 @@ debugPrint("reached save user");
     bool encrypt = false,
     bool isResponseEncrypted = false,
   }) async {
-
     debugPrint('endpoints  is $endpoint');
     debugPrint('data  is $data');
 
@@ -389,9 +405,11 @@ debugPrint("reached save user");
 
       debugPrint('response is $response');
 
-      if (ErrorHandler.handleRemoteStatusCode(response.statusCode!, response.data)) {
-
-        return fromMap(response.data!["data"]);
+      if (ErrorHandler.handleRemoteStatusCode(
+        response.statusCode!,
+        response.data,
+      )) {
+        return fromMap(response.data!["data"]??{});
       } else {
         throw Exception("Error");
       }
@@ -402,19 +420,73 @@ debugPrint("reached save user");
       debugPrint(" App-level error: ${e.toString()}");
       debugPrintStack();
       throw RemoteExceptions(
-          ErrorCode.APP_ERROR, ErrorCode.APP_ERROR.getLocalizedMessage());
+        ErrorCode.APP_ERROR,
+        ErrorCode.APP_ERROR.getLocalizedMessage(),
+      );
     }
   }
 
 
+Future<void> performPostRequestNoRes(
+  String endpoint,
+  dynamic data, {
+  bool useToken = true,
+  bool encrypt = false,
+  bool isResponseEncrypted = false,
+}) async {
+  debugPrint('endpoints is $endpoint');
+  debugPrint('data is $data');
+
+  if (encrypt) {
+    debugPrint("encryption");
+  }
+  
+  try {
+    final response = await dio.postUri(
+      uri.resolve(baseUrl + endpoint),
+      data: data,
+      options: await _setOptions(useToken),
+    );
+
+    if (isResponseEncrypted) {
+      debugPrint("encrypted response");
+    }
+
+    debugPrint('response is $response');
+
+    if (ErrorHandler.handleRemoteStatusCode(
+      response.statusCode!,
+      response.data,
+    )) {
+      // You may want to handle the response data here if needed
+      // For example, logging or further processing
+      debugPrint('Processed data: ${response.data!["data"] ?? {}}');
+    } else {
+      throw Exception("Error");
+    }
+  } catch (e) {
+    if (e is RemoteExceptions) rethrow;
+    if (e is DioError) throw ErrorHandler.handleDioError(e);
+
+    debugPrint("App-level error: ${e.toString()}");
+    debugPrintStack();
+    throw RemoteExceptions(
+      ErrorCode.APP_ERROR,
+      ErrorCode.APP_ERROR.getLocalizedMessage(),
+    );
+  }
+}
+
+
+
   Future<T> performPostRequestWithFormData<T>(
-      String endpoint,
-      dynamic data,
-      T Function(Map<String, dynamic>) fromMap, {
-        bool useToken = true,
-        bool encrypt = false,
-        bool isResponseEncrypted = false,
-      }) async {
+    String endpoint,
+    dynamic data,
+    T Function(Map<String, dynamic>) fromMap, {
+    bool useToken = true,
+    bool encrypt = false,
+    bool isResponseEncrypted = false,
+  }) async {
     debugPrint('endpoints  is $endpoint');
     debugPrint('data  is $data');
     if (encrypt) {
@@ -431,7 +503,10 @@ debugPrint("reached save user");
         debugPrint("encrypted response");
       }
       debugPrint('response is $response');
-      if (ErrorHandler.handleRemoteStatusCode(response.statusCode!, response.data)) {
+      if (ErrorHandler.handleRemoteStatusCode(
+        response.statusCode!,
+        response.data,
+      )) {
         return fromMap(response.data!["data"]);
       } else {
         throw Exception("Error");
@@ -443,16 +518,13 @@ debugPrint("reached save user");
       debugPrint(" App-level error: ${e.toString()}");
       debugPrintStack();
       throw RemoteExceptions(
-          ErrorCode.APP_ERROR, ErrorCode.APP_ERROR.getLocalizedMessage());
+        ErrorCode.APP_ERROR,
+        ErrorCode.APP_ERROR.getLocalizedMessage(),
+      );
     }
   }
 
-
-
-
   ///////////////// PUT /////////////////
-
-
 
   Future<T> performPutRequest<T>(
     String endpoint,
@@ -478,7 +550,9 @@ debugPrint("reached save user");
       }
       debugPrint('response is $response');
       if (ErrorHandler.handleRemoteStatusCode(
-          response.statusCode!, response.data)) {
+        response.statusCode!,
+        response.data,
+      )) {
         return fromMap(response.data!["data"]);
       } else {
         throw Exception("Error");
@@ -490,16 +564,21 @@ debugPrint("reached save user");
       debugPrint(" App-level error: ${e.toString()}");
       debugPrintStack();
       throw RemoteExceptions(
-          ErrorCode.APP_ERROR, ErrorCode.APP_ERROR.getLocalizedMessage());
+        ErrorCode.APP_ERROR,
+        ErrorCode.APP_ERROR.getLocalizedMessage(),
+      );
     }
   }
 
-  performPutRequestWithFormDataNoRes(String endpoint, dynamic data,
-      {bool useToken = true,
-      bool encrypt = false,
-      bool isResponseEncrypted = false,
-      String? keyWord,
-      required bool needResponse}) async {
+  performPutRequestWithFormDataNoRes(
+    String endpoint,
+    dynamic data, {
+    bool useToken = true,
+    bool encrypt = false,
+    bool isResponseEncrypted = false,
+    String? keyWord,
+    required bool needResponse,
+  }) async {
     debugPrint('endpoints  is $endpoint');
     debugPrint('data  is $data');
     if (encrypt) {
@@ -518,7 +597,10 @@ debugPrint("reached save user");
       if (needResponse) {
         debugPrint('response is $response');
       }
-      if (ErrorHandler.handleRemoteStatusCode(response.statusCode!, response.data["data"])) {
+      if (ErrorHandler.handleRemoteStatusCode(
+        response.statusCode!,
+        response.data["data"],
+      )) {
       } else {
         throw Exception("Error");
       }
@@ -529,14 +611,13 @@ debugPrint("reached save user");
       debugPrint(" App-level error: ${e.toString()}");
       debugPrintStack();
       throw RemoteExceptions(
-          ErrorCode.APP_ERROR, ErrorCode.APP_ERROR.getLocalizedMessage());
+        ErrorCode.APP_ERROR,
+        ErrorCode.APP_ERROR.getLocalizedMessage(),
+      );
     }
   }
 
-
-
   ///////////////// DELETE /////////////////
-
 
   Future<T> performDeleteRequest<T>(
     String endpoint,
@@ -554,7 +635,9 @@ debugPrint("reached save user");
       debugPrint('response: $response');
 
       if (ErrorHandler.handleRemoteStatusCode(
-          response.statusCode!, response.data)) {
+        response.statusCode!,
+        response.data,
+      )) {
         return fromMap(response.data!);
       } else {
         throw Exception("Error");
@@ -566,16 +649,11 @@ debugPrint("reached save user");
       debugPrint(" App-level error: ${e.toString()}");
       debugPrintStack();
       throw RemoteExceptions(
-          ErrorCode.APP_ERROR, ErrorCode.APP_ERROR.getLocalizedMessage());
+        ErrorCode.APP_ERROR,
+        ErrorCode.APP_ERROR.getLocalizedMessage(),
+      );
     }
   }
-
-
-
-
-
-
-
 
   Future<String?> _getToken() async {
     if (_cachedToken != null) {
@@ -592,8 +670,9 @@ debugPrint("reached save user");
 
   Future<Options> _setOptions(bool useToken) async {
     Options options = Options(
-        sendTimeout: const Duration(seconds: 60),
-        receiveTimeout: const Duration(seconds: 60));
+      sendTimeout: const Duration(seconds: 60),
+      receiveTimeout: const Duration(seconds: 60),
+    );
     if (useToken) {
       // String? token = await _getToken();
       String ? token = "6|9lyE2OyyGuArZWWtqxvh1ZNBuNUyvJhfDJsaWufD7812ffa7";
