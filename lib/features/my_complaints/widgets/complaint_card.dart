@@ -78,7 +78,7 @@ class ComplaintCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildLine("Type of complaint: Service Issue", titleFont),
+                    _buildLine("Type of complaint:", titleFont),
                     SizedBox(height: spacing),
                     _buildLine("Date: 2023-11-23  Time: 10:30 AM", titleFont),
                     SizedBox(height: spacing),
