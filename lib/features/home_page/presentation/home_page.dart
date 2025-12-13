@@ -8,7 +8,8 @@ import 'package:internet_application_project/core/resources/colorfile.dart';
 import 'package:internet_application_project/core/resources/responsive_util.dart';
 import 'package:internet_application_project/core/services/generalized_api.dart';
 import 'package:internet_application_project/core/widgets/custom_button.dart';
-import 'package:internet_application_project/features/Form/presentation/complaints_types.dart';
+import 'package:internet_application_project/features/Form/cubit/form_complaint_cubit.dart';
+import 'package:internet_application_project/features/Form/presentation/complaints_types_page.dart';
 import 'package:internet_application_project/features/Form/presentation/preview.dart';
 import 'package:internet_application_project/features/home_page/cubit/home_page_cubit.dart';
 import 'package:internet_application_project/features/home_page/cubit/home_page_state.dart';
@@ -253,9 +254,16 @@ class _AgencyGridBlocWrapperState extends State<_AgencyGridBlocWrapper> {
           itemBuilder: (BuildContext context, int index) {
             final agency = agencies[index];
             return GestureDetector(
-              onTap: () => Navigator.of(
-                context,
-              ).push(MaterialPageRoute(builder: (context) => ComplaintsTypes(agencyId: agency.id,))),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => BlocProvider(
+ create: (context) => FormComplaintCubit(
+        remoteService:context.read<RemoteService>()),
+            child: ComplaintsTypesPage(agencyId: agency.id),
+                  ),
+                ),
+              ),
+
               child: GovernmentAgencyCardItem(governmentAgency: agency),
             );
           },
