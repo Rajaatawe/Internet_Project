@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:internet_application_project/core/models/complaints_model.dart';
 import 'package:internet_application_project/core/resources/responsive_util.dart';
 import 'package:internet_application_project/core/widgets/customAppBar.dart';
 import 'package:open_filex/open_filex.dart';
@@ -7,87 +8,138 @@ import 'package:url_launcher/url_launcher.dart';
 final GlobalKey<NavigatorState> navigatorKey1 = GlobalKey<NavigatorState>();
 
 class ViewDocumentsPage extends StatelessWidget {
-  const ViewDocumentsPage({super.key});
+  final List<Media> mediaList;
+  
+  const ViewDocumentsPage({
+    super.key,
+    required this.mediaList,
+  });
 
-  Future<Map<String, List<String>>> fetchDocuments() async {
-    // ضع هنا استدعاء API الحقيقي
+  Map<String, List<String>> _categorizeMedia() {
+    List<String> photos = [];
+    List<String> videos = [];
+    List<String> files = [];
+
+    for (var media in mediaList) {
+      final url = media.url;
+      final lowerUrl = url.toLowerCase();
+      
+      // تصنيف حسب الامتداد
+      if (_isImageFile(lowerUrl)) {
+        photos.add(url);
+      } else if (_isVideoFile(lowerUrl)) {
+        videos.add(url);
+      } else {
+        files.add(url);
+      }
+    }
+
     return {
-      "photos": [
-        "https://images.unsplash.com/photo-1519681393784-d120267933ba",
-        "https://images.unsplash.com/photo-1506765515384-028b60a970df",
-      ],
-      "files": [
-        "https://www.w3.org/TR/PNG/iso_8859-1.txt",
-        // مثال على ملف محلي على الهاتف يجب أن يكون موجود
-        // "/storage/emulated/0/Download/example.pdf",
-      ],
-      "videos": [
-        "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4",
-      ],
+      'photos': photos,
+      'videos': videos,
+      'files': files,
     };
+  }
+
+  bool _isImageFile(String url) {
+    return url.endsWith('.jpg') ||
+           url.endsWith('.jpeg') ||
+           url.endsWith('.png') ||
+           url.endsWith('.gif') ||
+           url.endsWith('.bmp') ||
+           url.endsWith('.webp') ||
+           url.contains('unsplash.com') ||
+           url.contains('image') ||
+           url.contains('photo') ||
+           url.contains('img');
+  }
+
+  bool _isVideoFile(String url) {
+    return url.endsWith('.mp4') ||
+           url.endsWith('.mov') ||
+           url.endsWith('.avi') ||
+           url.endsWith('.wmv') ||
+           url.endsWith('.flv') ||
+           url.endsWith('.mkv') ||
+           url.endsWith('.webm') ||
+           url.contains('video') ||
+           url.contains('mp4');
   }
 
   @override
   Widget build(BuildContext context) {
     final spacing = ResponsiveUtils.mediumSpacing(context);
     final subtitleFont = ResponsiveUtils.bodyTextSize(context);
+    
+    final categorizedMedia = _categorizeMedia();
+    final photos = categorizedMedia['photos'] ?? [];
+    final videos = categorizedMedia['videos'] ?? [];
+    final files = categorizedMedia['files'] ?? [];
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar(title: 'View Documents', icon: Icons.arrow_back),
-      body: FutureBuilder<Map<String, List<String>>>(
-        future: fetchDocuments(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Failed to load documents'));
-          }
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(spacing),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Photos Section
+            if (photos.isNotEmpty) ...[
+              Text(
+                "Photos (${photos.length})",
+                style: TextStyle(fontSize: subtitleFont, fontWeight: FontWeight.w600),
+              ),
+              SizedBox(height: spacing),
+              _buildPhotoGrid(context, photos),
+              SizedBox(height: spacing * 2),
+            ],
 
-          final photos = snapshot.data?['photos'] ?? [];
-          final files = snapshot.data?['files'] ?? [];
-          final videos = snapshot.data?['videos'] ?? [];
+            // Videos Section
+            if (videos.isNotEmpty) ...[
+              Text(
+                "Videos (${videos.length})",
+                style: TextStyle(fontSize: subtitleFont, fontWeight: FontWeight.w600),
+              ),
+              SizedBox(height: spacing),
+              _buildVideoGrid(context, videos),
+              SizedBox(height: spacing * 2),
+            ],
 
-          return SingleChildScrollView(
-            padding: EdgeInsets.all(spacing),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Photos",
-                  style: TextStyle(fontSize: subtitleFont, fontWeight: FontWeight.w600),
+            // Files Section
+            if (files.isNotEmpty) ...[
+              const Divider(thickness: 1, color: Colors.brown),
+              SizedBox(height: spacing),
+              Text(
+                "Files (${files.length})",
+                style: TextStyle(fontSize: subtitleFont, fontWeight: FontWeight.w600),
+              ),
+              SizedBox(height: spacing),
+              _buildDocumentGrid(context, files),
+            ],
+
+            // Empty State
+            if (mediaList.isEmpty) ...[
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+                    Icon(Icons.folder_open, size: 64, color: Colors.grey.shade400),
+                    SizedBox(height: spacing),
+                    Text(
+                      "No documents available",
+                      style: TextStyle(
+                        fontSize: subtitleFont,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: spacing),
-                photos.isNotEmpty
-                    ? _buildPhotoGrid(context, photos)
-                    : const Text("No photos available", style: TextStyle(color: Colors.grey)),
-
-                SizedBox(height: spacing * 2),
-                Text(
-                  "Videos",
-                  style: TextStyle(fontSize: subtitleFont, fontWeight: FontWeight.w600),
-                ),
-                SizedBox(height: spacing),
-                videos.isNotEmpty
-                    ? _buildVideoGrid(context, videos)
-                    : const Text("No videos available", style: TextStyle(color: Colors.grey)),
-
-                SizedBox(height: spacing * 2),
-                const Divider(thickness: 1, color: Colors.brown),
-                SizedBox(height: spacing),
-                Text(
-                  "Files",
-                  style: TextStyle(fontSize: subtitleFont, fontWeight: FontWeight.w600),
-                ),
-                SizedBox(height: spacing),
-                files.isNotEmpty
-                    ? _buildDocumentGrid(context, files)
-                    : const Text("No documents available", style: TextStyle(color: Colors.grey)),
-              ],
-            ),
-          );
-        },
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -120,6 +172,17 @@ class ViewDocumentsPage extends StatelessWidget {
               width: size,
               height: size,
               fit: BoxFit.cover,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Center(
+                  child: CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                        : null,
+                  ),
+                );
+              },
               errorBuilder: (context, error, stackTrace) => Container(
                 width: size,
                 height: size,
@@ -154,13 +217,49 @@ class ViewDocumentsPage extends StatelessWidget {
               color: Colors.black12,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Center(
-              child: Icon(Icons.play_circle_fill, color: Colors.red, size: 50),
+            child: Stack(
+              children: [
+                if (_isUrl(url))
+                  Image.network(
+                    _getVideoThumbnailUrl(url),
+                    width: size,
+                    height: size,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(),
+                  ),
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.5),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.play_circle_fill, color: Colors.red, size: 40),
+                  ),
+                ),
+              ],
             ),
           ),
         );
       },
     );
+  }
+
+  String _getVideoThumbnailUrl(String videoUrl) {
+    // محاولة إنشاء رابط ثامبنيل للفيديو
+    if (videoUrl.contains('youtube.com') || videoUrl.contains('youtu.be')) {
+      final videoId = videoUrl.contains('youtube.com')
+          ? videoUrl.split('v=')[1].split('&')[0]
+          : videoUrl.split('youtu.be/')[1].split('?')[0];
+      return 'https://img.youtube.com/vi/$videoId/0.jpg';
+    }
+    
+    if (videoUrl.contains('vimeo.com')) {
+      final videoId = videoUrl.split('vimeo.com/')[1].split('/').last;
+      return 'https://i.vimeocdn.com/video/$videoId.webp';
+    }
+    
+    return videoUrl; // لغير ذلك، نرجع نفس الرابط
   }
 
   Widget _buildDocumentGrid(BuildContext context, List<String> files) {
@@ -176,26 +275,35 @@ class ViewDocumentsPage extends StatelessWidget {
       ),
       itemBuilder: (context, index) {
         final path = files[index];
-        final lower = path.toLowerCase();
-        final isPdf = lower.endsWith(".pdf");
-        final isDoc = lower.endsWith(".doc") || lower.endsWith(".docx");
-        final isTxt = lower.endsWith(".txt");
-
+        final fileName = path.split('/').last;
+        final lower = fileName.toLowerCase();
+        
         IconData icon;
-        if (isPdf) {
+        Color iconColor = Colors.brown;
+        
+        if (lower.endsWith('.pdf')) {
           icon = Icons.picture_as_pdf;
-        } else if (isDoc) {
+          iconColor = Colors.red;
+        } else if (lower.endsWith('.doc') || lower.endsWith('.docx')) {
           icon = Icons.insert_drive_file;
-        } else if (isTxt) {
+          iconColor = Colors.blue;
+        } else if (lower.endsWith('.txt')) {
           icon = Icons.description;
+          iconColor = Colors.black;
+        } else if (lower.endsWith('.xls') || lower.endsWith('.xlsx')) {
+          icon = Icons.table_chart;
+          iconColor = Colors.green;
+        } else if (lower.endsWith('.zip') || lower.endsWith('.rar')) {
+          icon = Icons.folder_zip;
+          iconColor = Colors.orange;
         } else {
           icon = Icons.insert_drive_file;
         }
 
         return GestureDetector(
-          onTap: () => _isUrl(path) ? _launchURL(path) : OpenFilex.open(path),
+          onTap: () => _openFile(path),
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(8),
@@ -211,14 +319,29 @@ class ViewDocumentsPage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, size: ResponsiveUtils.isMobile(context) ? 48 : 64, color: Colors.brown),
+                Icon(
+                  icon,
+                  size: ResponsiveUtils.isMobile(context) ? 48 : 64,
+                  color: iconColor,
+                ),
                 const SizedBox(height: 8),
                 Text(
-                  path.split('/').last,
+                  fileName,
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 12),
+                  style: TextStyle(
+                    fontSize: ResponsiveUtils.isMobile(context) ? 11 : 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  _getFileSize(path),
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: Colors.grey,
+                  ),
                 ),
               ],
             ),
@@ -228,20 +351,60 @@ class ViewDocumentsPage extends StatelessWidget {
     );
   }
 
+  String _getFileSize(String path) {
+    // هذه دالة افتراضية، يمكنك تعديلها بناءً على بياناتك الفعلية
+    if (path.contains('unsplash')) return '~2 MB';
+    if (path.contains('sample-videos')) return '~1 MB';
+    return 'Unknown size';
+  }
+
   void _openPhoto(BuildContext context, String imageUrl) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => Scaffold(
-          backgroundColor: Colors.black,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            iconTheme: const IconThemeData(color: Colors.white),
-          ),
-          body: Center(
-            child: Image.network(imageUrl, fit: BoxFit.contain),
-          ),
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(20),
+        child: Stack(
+          children: [
+            Center(
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.contain,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) => Container(
+                  color: Colors.grey.shade200,
+                  child: const Center(
+                    child: Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 10,
+              right: 10,
+              child: GestureDetector(
+                onTap: () => Navigator.of(context).pop(),
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close, color: Colors.white, size: 24),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -251,16 +414,43 @@ class ViewDocumentsPage extends StatelessWidget {
     final Uri uri = Uri.parse(url);
 
     try {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        throw 'Could not launch $url';
+      }
     } catch (e) {
       debugPrint('Cannot open link: $url. Error: $e');
       if (navigatorKey1.currentContext != null) {
         ScaffoldMessenger.of(navigatorKey1.currentContext!).showSnackBar(
-          const SnackBar(content: Text('Cannot open this link')),
+          SnackBar(
+            content: Text('Cannot open this link: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
   }
 
-  bool _isUrl(String path) => path.startsWith("http://") || path.startsWith("https://");
+  Future<void> _openFile(String path) async {
+    if (_isUrl(path)) {
+      await _launchURL(path);
+    } else {
+      try {
+        await OpenFilex.open(path);
+      } catch (e) {
+        debugPrint('Cannot open file: $path. Error: $e');
+        if (navigatorKey1.currentContext != null) {
+          ScaffoldMessenger.of(navigatorKey1.currentContext!).showSnackBar(
+            SnackBar(
+              content: Text('Cannot open file: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  bool _isUrl(String path) => path.startsWith("http://") || path.startsWith("https://") || path.startsWith("www.");
 }
