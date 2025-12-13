@@ -201,7 +201,9 @@ class _LoginPageState extends State<LoginPage> {
                       title: 'Enter your email or phone number',
                       hintText: 'example@gmail.com / 0999112233',
                       controller: emailController,
-                      validator: validateEmail,
+                      validator: (v) =>
+    validateEmail(v, mode: AuthFieldMode.emailOrPhone),
+ 
                       keyboardType: TextInputType.emailAddress,
                       obscureText: false,
                     ),

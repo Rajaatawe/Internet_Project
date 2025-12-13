@@ -167,8 +167,18 @@ class _RegisterPageState extends State<RegisterPage> {
             keyboardType: TextInputType.text,
             maxLines: 1,
             textEditingController: firstNameController,
-            validator: (value) =>
-                value?.isEmpty ?? true ? 'First name is required' : null,
+          validator: (v) {
+  if (v == null || v.trim().isEmpty) {
+    return 'First name is required';
+  }
+  return validateText(
+    v,
+    fieldName: 'First name',
+    minLength: 2,
+    maxLength: 50,
+  );
+},
+
             obscureText: false,
             showLabel: false,
             filled: false,
@@ -241,7 +251,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   keyboardType: TextInputType.emailAddress,
                   maxLines: 1,
                   textEditingController: emailController,
-                  validator: validateEmail,
+                  validator: (v) =>
+                      validateEmail(v, mode: AuthFieldMode.emailOnly),
+
                   obscureText: false,
                   showLabel: false,
                   filled: false,
@@ -526,8 +538,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                           Navigator.pushAndRemoveUntil(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) =>
-                                                  LoginPage(),
+                                              builder: (context) => LoginPage(),
                                             ),
                                             (Route<dynamic> route) => false,
                                           );

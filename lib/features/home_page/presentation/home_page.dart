@@ -31,17 +31,18 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-final token = NotificationService().token;
+// final token = NotificationService().token;
 
-    if (token != null && token.isNotEmpty) {
-      final deviceType = getDeviceType(context);
-        final platform = getPlatform();
-      context.read<NotificationCubit>().saveToken(
-        token,
-        deviceType, 
-        platform,
-      );
-    }  }
+    // if (token != null && token.isNotEmpty) {
+    //   final deviceType = getDeviceType(context);
+    //     final platform = getPlatform();
+    //   context.read<NotificationCubit>().saveToken(
+    //     token,
+    //     deviceType, 
+    //     platform,
+    //   );
+    // }  
+    }
     String getPlatform() {
   if (Platform.isAndroid) return 'android';
   if (Platform.isIOS) return 'ios';

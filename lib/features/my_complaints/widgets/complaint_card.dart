@@ -30,8 +30,9 @@ class ComplaintCard extends StatelessWidget {
       padding: EdgeInsets.all(cardPadding),
       decoration: BoxDecoration(
         color: whiteBrown,
-        borderRadius:
-            BorderRadius.circular(ResponsiveUtils.mediumBorderRadius(context)),
+        borderRadius: BorderRadius.circular(
+          ResponsiveUtils.mediumBorderRadius(context),
+        ),
         boxShadow: [
           BoxShadow(
             color: darkBrown.withOpacity(0.3),
@@ -60,20 +61,26 @@ class ComplaintCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildLine(
-                        "Type of complaint: ${complaint.complaintType.name}",
-                        titleFont),
+                      "Type of complaint: ${complaint.complaintType.name}",
+                      titleFont,
+                    ),
                     SizedBox(height: spacing),
                     _buildLine(
-                        "Date: ${complaint.createdAt.toLocal().toString().split(' ')[0]} "
-                        "Time: ${TimeOfDay.fromDateTime(complaint.createdAt).format(context)}",
-                        titleFont),
+                      "Date: ${complaint.createdAt.toLocal().toString().split(' ')[0]} "
+                      "Time: ${TimeOfDay.fromDateTime(complaint.createdAt).format(context)}",
+                      titleFont,
+                    ),
                     SizedBox(height: spacing),
                     _buildLine(
-                        "Governmental entity: ${complaint.governmentAgency.agencyName}",
-                        titleFont),
+                      "Governmental entity: ${complaint.governmentAgency.agencyName}",
+                      titleFont,
+                    ),
                     SizedBox(height: spacing),
-                    _buildLine("Status: ${complaint.status}", titleFont,
-                        color: _statusColor(complaint.status)),
+                    _buildLine(
+                      "Status: ${complaint.status}",
+                      titleFont,
+                      color: _statusColor(complaint.status),
+                    ),
                   ],
                 ),
               ),
@@ -96,8 +103,9 @@ class ComplaintCard extends StatelessWidget {
                             address:
                                 "${complaint.latitude}, ${complaint.longitude}",
                             location: LatLng(
-                                double.parse(complaint.latitude),
-                                double.parse(complaint.longitude)),
+                              double.parse(complaint.latitude),
+                              double.parse(complaint.longitude),
+                            ),
                           ),
                         );
                       },
@@ -115,7 +123,8 @@ class ComplaintCard extends StatelessWidget {
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => ViewDocumentsPage(),
+                        builder: (context) =>
+                            ViewDocumentsPage(mediaList: complaint.media),
                       ),
                     );
                   },
