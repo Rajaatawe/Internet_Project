@@ -122,9 +122,9 @@ class ComplaintCard extends StatelessWidget {
               Expanded(
                 child: CustomButton(
                   onTap: (){
-          //           Navigator.of(context).push(
-          //   MaterialPageRoute(builder: (context) => ViewDocumentsPage()),
-          // );
+                    Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => ViewDocumentsPage()),
+          );
                   },
                   height: buttonHeight,
                   title: 'View documents',

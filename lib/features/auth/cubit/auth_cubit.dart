@@ -65,8 +65,6 @@ class AuthCubit extends Cubit<AuthState> {
              'password':password,
               'password_confirmation':passwordConfirmation,
               'email': email,
-
-
       };
       await _remoteDatasource.performAuthRequestRegisterOnly('register',data , UserClass.fromJson);
       emit(state.copyWith(

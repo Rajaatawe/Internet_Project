@@ -51,17 +51,16 @@ class Message {
 
 class UserClass {
   final int id;
-  final String? firstName;
-  final String? middleName; // يمكن أن تكون null
-  final String? lastName;
-  final String? phone;
-  final String ?email;
-  final String ?identityNumber;
+  final String firstName;
+  final String? middleName;
+  final String lastName;
+  final String phone;
+  final String email;
+  final String identityNumber;
   final bool isActive;
-  final DateTime lastLoginAt;
-  final int? governmentAgencyId; // يمكن أن تكون null
-  final DateTime? emailVerifiedAt; // يمكن أن تكون null
-
+  final DateTime? lastLoginAt;
+  final int? governmentAgencyId;
+  final DateTime? emailVerifiedAt;
 
   UserClass({
     required this.id,
@@ -72,25 +71,23 @@ class UserClass {
     required this.email,
     required this.identityNumber,
     required this.isActive,
-    required this.lastLoginAt,
+    this.lastLoginAt,
     this.governmentAgencyId, // يمكن أن تكون null
     this.emailVerifiedAt, // يمكن أن تكون null
-
   });
 
   factory UserClass.fromJson(Map<String, dynamic> json) => UserClass(
     id: json["id"],
-    firstName: json["first_name"],
+    firstName: json["first_name"] ?? "", // Provide default value if null
     middleName: json["middle_name"], // يمكن أن تكون null
-    lastName: json["last_name"],
-    phone: json["phone"],
-    email: json["email"],
-    identityNumber: json["identity_number"],
+    lastName: json["last_name"] ?? "", // Provide default value if null
+    phone: json["phone"] ?? "", 
+    email: json["email"] ?? "", // Provide default value if null
+    identityNumber: json["identity_number"] ?? "", // Provide default value if null
     isActive: json["is_active"] ?? false,
-    lastLoginAt: DateTime.parse(json["last_login_at"]),
+    lastLoginAt: json["last_login_at"] != null ? DateTime.parse(json["last_login_at"]) : null, // يمكن أن تكون null
     governmentAgencyId: json["government_agency_id"], // يمكن أن تكون null
     emailVerifiedAt: json["email_verified_at"] != null ? DateTime.parse(json["email_verified_at"]) : null, // يمكن أن تكون null
-  
   );
 
   Map<String, dynamic> toJson() => {
@@ -102,9 +99,8 @@ class UserClass {
     "email": email,
     "identity_number": identityNumber,
     "is_active": isActive,
-    "last_login_at": lastLoginAt.toIso8601String(),
+    "last_login_at": lastLoginAt?.toIso8601String(), // Make it nullable
     "government_agency_id": governmentAgencyId, // يمكن أن تكون null
     "email_verified_at": emailVerifiedAt?.toIso8601String(), // يمكن أن تكون null
-
   };
 }

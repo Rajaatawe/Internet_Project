@@ -349,6 +349,7 @@ class RemoteService {
       final response = await dio.get(
         baseUrl + endpoint,
         options: await _setOptions(useToken),
+
       );
       if (isResponseEncrypted) {
         debugPrint("encrypted response");
@@ -737,8 +738,7 @@ Future<void> performPostRequestNoRes(
       receiveTimeout: const Duration(seconds: 60),
     );
     if (useToken) {
-      // String? token = await _getToken();
-      String ? token = "6|9lyE2OyyGuArZWWtqxvh1ZNBuNUyvJhfDJsaWufD7812ffa7";
+      String? token = await _getToken();
       // if (token == null) {
       //   throw const RemoteExceptions(
       //       ErrorCode.USER_DATA_NOT_FOUND, 'not logged in');

@@ -214,20 +214,19 @@ class _RegisterPageState extends State<RegisterPage> {
       listener: (context, state) {
         if (state.otpState == StateValue.success) {
           // OTP sent successfully - show success message
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.otpMessage),
-              backgroundColor: Colors.green,
-            ),
-          );
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(
+          //     content: Text(state.otpMessage),
+          //     backgroundColor: Colors.green,
+          //   ),
+          // );
         } else if (state.otpState == StateValue.error) {
-          // OTP sending failed
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.otpMessage),
-              backgroundColor: Colors.red,
-            ),
-          );
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(
+          //     content: Text(state.otpMessage),
+          //     backgroundColor: Colors.red,
+          //   ),
+          // );
         }
       },
       child: Column(
