@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:internet_application_project/core/models/notification_model.dart';
+import 'package:internet_application_project/core/resources/colorfile.dart';
 
 class NotificationDetailsPage extends StatelessWidget {
   final NotificationModel notification;
@@ -12,9 +13,9 @@ class NotificationDetailsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Notification Details"),
+        title: const Text("Notification Details",style: TextStyle(color: darkBrown),),
         centerTitle: true,
-        backgroundColor: theme.primaryColor,
+        backgroundColor: fourthColor,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),

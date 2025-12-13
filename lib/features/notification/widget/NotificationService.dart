@@ -10,9 +10,13 @@ import 'package:internet_application_project/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationService {
-  String? token="";
-  static final NotificationService _instance = NotificationService._internal();
+  String? token = "";
+
+  static final NotificationService _instance =
+      NotificationService._internal();
+
   factory NotificationService() => _instance;
+
   NotificationService._internal();
 
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
@@ -36,32 +40,35 @@ class NotificationService {
       onDidReceiveNotificationResponse: (_) => _openNotificationsPage(),
     );
 
-    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+    const AndroidNotificationChannel channel =
+        AndroidNotificationChannel(
       'fcm_channel',
       'FCM Notifications',
       importance: Importance.high,
       description: 'FCM Channel',
     );
-        
-  token =await _messaging.getToken();
 
-         print ("///////////////////////////////////FCM token: $token"  );
+    token = await _messaging.getToken();
+    print("🔑❤FCM token: $token🎄❤");
 
     await _localNotifications
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
+    // ✅ عند التطبيق مفتوح
     FirebaseMessaging.onMessage.listen((message) {
       _handleMessage(message);
       _showLocalNotification(message);
     });
 
+    // ✅ عند الضغط على الإشعار
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
       _handleMessage(message);
       _openNotificationsPage();
     });
 
+    // ✅ عند فتح التطبيق من إشعار
     final initialMessage = await _messaging.getInitialMessage();
     if (initialMessage != null) {
       _handleMessage(initialMessage);
@@ -77,23 +84,25 @@ class NotificationService {
     );
   }
 
-Future<void> _handleMessage(RemoteMessage message) async {
-  final notification = NotificationModel(
-    title: message.notification?.title ?? '',
-    description: message.notification?.body ?? '',
-    time: DateTime.now().timeZoneName,
-  );
+  // ✅ حفظ الإشعار (Foreground)
+  Future<void> _handleMessage(RemoteMessage message) async {
+    final notification = NotificationModel(
+      title: message.notification?.title ?? '',
+      description: message.notification?.body ?? '',
+      time: DateTime.now().toIso8601String(),
+    );
 
-  await _saveNotification(notification);
+    await _saveNotification(notification);
 
-  if (navigatorKey.currentContext != null) {
-    final cubit =
-        BlocProvider.of<NotificationCubit>(navigatorKey.currentContext!);
-    cubit.addNotification(notification);
+    if (navigatorKey.currentContext != null) {
+      final cubit =
+          BlocProvider.of<NotificationCubit>(
+              navigatorKey.currentContext!);
+      cubit.addNotification(notification);
+    }
   }
-}
 
-
+  // ✅ التخزين الدائم
   Future<void> _saveNotification(NotificationModel notification) async {
     final prefs = await SharedPreferences.getInstance();
     final list = prefs.getStringList(_storageKey) ?? [];
@@ -102,6 +111,7 @@ Future<void> _handleMessage(RemoteMessage message) async {
     await prefs.setStringList(_storageKey, list);
   }
 
+  // ✅ تحميل الإشعارات بعد إعادة فتح التطبيق
   Future<List<NotificationModel>> loadStoredNotifications() async {
     final prefs = await SharedPreferences.getInstance();
     final list = prefs.getStringList(_storageKey) ?? [];

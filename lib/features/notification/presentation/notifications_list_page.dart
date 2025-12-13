@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:internet_application_project/core/models/notification_model.dart';
+import 'package:internet_application_project/core/resources/colorfile.dart';
 import 'package:internet_application_project/features/notification/cubit/notification_cubit.dart';
 import 'package:internet_application_project/features/notification/presentation/notification_details_page.dart';
 
@@ -12,7 +13,8 @@ class NotificationsListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Notifications"),
+        backgroundColor: fourthColor,
+        title: const Text("Notifications",style: TextStyle(color: darkBrown),),
         centerTitle: true,
       ),
       body: BlocBuilder<NotificationCubit, List<NotificationModel>>(

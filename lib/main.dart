@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:internet_application_project/core/config/app_configt.dart';
+import 'package:internet_application_project/core/models/notification_model.dart';
 import 'package:internet_application_project/core/services/generalized_api.dart';
 import 'package:internet_application_project/features/home_page/presentation/home_page.dart';
 import 'package:internet_application_project/features/my_complaints/presentation/my_complaints_page.dart';
@@ -11,6 +14,7 @@ import 'package:internet_application_project/features/my_complaints/presentation
 import 'package:internet_application_project/features/notification/widget/NotificationService.dart';
 import 'package:internet_application_project/features/notification/cubit/notification_cubit.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'core/services/service_locator.dart';
 import 'features/auth/cubit/auth_cubit.dart';
 import 'features/auth/presentation/login_page.dart';
@@ -25,13 +29,26 @@ Future<void> safeFirebaseInit() async {
 }
 
 @pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await safeFirebaseInit();
+Future<void> firebaseMessagingBackgroundHandler(
+    RemoteMessage message) async {
 
-  print("📩 Background Notification:");
-  print("Title: ${message.notification?.title}");
-  print("Body: ${message.notification?.body}");
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final prefs = await SharedPreferences.getInstance();
+  const String storageKey = 'saved_notifications';
+
+  final notification = NotificationModel(
+    title: message.notification?.title ?? '',
+    description: message.notification?.body ?? '',
+    time: DateTime.now().toIso8601String(),
+  );
+
+  final list = prefs.getStringList(storageKey) ?? [];
+  list.add(jsonEncode(notification.toJson()));
+
+  await prefs.setStringList(storageKey, list);
 }
+
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
@@ -39,7 +56,7 @@ void main() async {
 
   await safeFirebaseInit();
 
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   
   final appConst = AppConst();
   await appConst.init();
