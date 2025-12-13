@@ -56,6 +56,10 @@ dependencies:
   photo_view: ^0.15.0
   chewie: ^1.13.0
   open_filex: ^4.7.0
+  path_provider: ^2.1.5
+  flutter_pdfview: ^1.4.3
+  pdfx: ^2.9.2
+  url_launcher: ^6.3.2
   
 dev_dependencies:
   flutter_test:
@@ -82,6 +86,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   # assets:
   assets:
+    - assets/files/2-Illustrate concepts.pdf
+
     - assets/images/
     - assets/fonts/static/
 
