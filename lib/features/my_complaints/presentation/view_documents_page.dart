@@ -4,7 +4,7 @@ import 'package:internet_application_project/core/widgets/customAppBar.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> navigatorKey1 = GlobalKey<NavigatorState>();
 
 class ViewDocumentsPage extends StatelessWidget {
   const ViewDocumentsPage({super.key});
@@ -254,8 +254,8 @@ class ViewDocumentsPage extends StatelessWidget {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } catch (e) {
       debugPrint('Cannot open link: $url. Error: $e');
-      if (navigatorKey.currentContext != null) {
-        ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
+      if (navigatorKey1.currentContext != null) {
+        ScaffoldMessenger.of(navigatorKey1.currentContext!).showSnackBar(
           const SnackBar(content: Text('Cannot open this link')),
         );
       }

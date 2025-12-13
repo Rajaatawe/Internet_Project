@@ -738,7 +738,7 @@ Future<void> performPostRequestNoRes(
       receiveTimeout: const Duration(seconds: 60),
     );
     if (useToken) {
-      String? token = await _getToken();
+      String? token = "46|buJtZa1MEvCB6zdHSAnvMKTv1FdJn92rfVhWvOtO295c7209";
       // if (token == null) {
       //   throw const RemoteExceptions(
       //       ErrorCode.USER_DATA_NOT_FOUND, 'not logged in');

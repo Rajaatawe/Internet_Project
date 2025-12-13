@@ -7,42 +7,31 @@ import 'package:internet_application_project/core/resources/responsive_util.dart
 import 'package:internet_application_project/features/my_complaints/presentation/view_documents_page.dart';
 import 'package:internet_application_project/features/my_complaints/widgets/complaint_card_details.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:internet_application_project/core/models/complaints_model.dart';
 
 class ComplaintCard extends StatelessWidget {
-  const ComplaintCard({super.key});
+  final Complaint complaint;
+
+  const ComplaintCard({super.key, required this.complaint});
 
   @override
   Widget build(BuildContext context) {
     final isMobile = ResponsiveUtils.isMobile(context);
     final isTablet = ResponsiveUtils.isTablet(context);
 
-    // Use ResponsiveUtils for all sizes
-    double cardPadding = ResponsiveUtils.cardPadding(
-      context,
-    ).left; // Use left/horizontal padding
-    double iconSize =
-        ResponsiveUtils.mediumIconSize(context) *
-        1.5; // Slightly larger for emphasis
+    double cardPadding = ResponsiveUtils.cardPadding(context).left;
+    double iconSize = ResponsiveUtils.mediumIconSize(context) * 1.5;
     double spacing = ResponsiveUtils.smallSpacing(context);
     double titleFont = ResponsiveUtils.bodyTextSize(context);
     double buttonHeight = ResponsiveUtils.buttonHeight(context);
     double buttonFontSize = ResponsiveUtils.bodyTextSize(context) * 0.95;
 
-    // Adjust margin based on whether it's in a ListView (Mobile) or GridView (Tablet/Desktop)
-    // The parent list/grid handles the main spacing, so we can simplify the card's own margin.
-    EdgeInsets cardMargin = isMobile
-        ? EdgeInsets
-              .zero // Margin is handled by ListView.builder padding
-        : EdgeInsets.zero; // Margin is handled by GridView.builder spacing
-
     return Container(
-      margin: cardMargin,
       padding: EdgeInsets.all(cardPadding),
       decoration: BoxDecoration(
         color: whiteBrown,
-        borderRadius: BorderRadius.circular(
-          ResponsiveUtils.mediumBorderRadius(context),
-        ),
+        borderRadius:
+            BorderRadius.circular(ResponsiveUtils.mediumBorderRadius(context)),
         boxShadow: [
           BoxShadow(
             color: darkBrown.withOpacity(0.3),
@@ -52,65 +41,67 @@ class ComplaintCard extends StatelessWidget {
         ],
       ),
       child: Column(
-        // Change Row to Column to better handle text wrapping on smaller screens
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Icon and main info section
+          // Icon + info
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: EdgeInsets.only(
-                  right: spacing * 2,
-                  top:
-                      spacing *
-                      2, // Adjusted top padding for vertical alignment
-                ),
+                padding: EdgeInsets.only(right: spacing * 2, top: spacing * 2),
                 child: Icon(
                   Icons.description_outlined,
                   size: iconSize,
                   color: darkBrown,
                 ),
               ),
-
-              // ------------ TEXT SECTION ------------
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildLine("Type of complaint:", titleFont),
-                    SizedBox(height: spacing),
-                    _buildLine("Date: 2023-11-23  Time: 10:30 AM", titleFont),
+                    _buildLine(
+                        "Type of complaint: ${complaint.complaintType.name}",
+                        titleFont),
                     SizedBox(height: spacing),
                     _buildLine(
-                      "Governmental entity: Ministry of Water",
-                      titleFont,
-                    ),
+                        "Date: ${complaint.createdAt.toLocal().toString().split(' ')[0]} "
+                        "Time: ${TimeOfDay.fromDateTime(complaint.createdAt).format(context)}",
+                        titleFont),
+                    SizedBox(height: spacing),
+                    _buildLine(
+                        "Governmental entity: ${complaint.governmentAgency.agencyName}",
+                        titleFont),
+                    SizedBox(height: spacing),
+                    _buildLine("Status: ${complaint.status}", titleFont,
+                        color: _statusColor(complaint.status)),
                   ],
                 ),
               ),
             ],
           ),
-
-          SizedBox(height: spacing * 3),
-
-          // -------- Buttons --------
+          SizedBox(height: spacing * 2),
+          // Buttons
           Row(
             children: [
               Expanded(
                 child: CustomButton(
-                  onTap: (){
+                  onTap: () {
                     showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return Dialog(
-        backgroundColor: Colors.transparent,
-        child:  ComplaintCardDetails( description: "Street light not working next to the school entrance...",
-    address: "San Francisco, CA, USA",
-    location: LatLng(37.7749, -122.4194),),
-      );
-    },
-  );
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Dialog(
+                          backgroundColor: Colors.transparent,
+                          child: ComplaintCardDetails(
+                            description: complaint.description,
+                            address:
+                                "${complaint.latitude}, ${complaint.longitude}",
+                            location: LatLng(
+                                double.parse(complaint.latitude),
+                                double.parse(complaint.longitude)),
+                          ),
+                        );
+                      },
+                    );
                   },
                   height: buttonHeight,
                   title: 'View details',
@@ -121,10 +112,12 @@ class ComplaintCard extends StatelessWidget {
               SizedBox(width: spacing),
               Expanded(
                 child: CustomButton(
-                  onTap: (){
+                  onTap: () {
                     Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => ViewDocumentsPage()),
-          );
+                      MaterialPageRoute(
+                        builder: (context) => ViewDocumentsPage(),
+                      ),
+                    );
                   },
                   height: buttonHeight,
                   title: 'View documents',
@@ -139,16 +132,30 @@ class ComplaintCard extends StatelessWidget {
     );
   }
 
-  // Helper for repeated text style
-  Widget _buildLine(String text, double fontSize) {
+  // Helper
+  Widget _buildLine(String text, double fontSize, {Color? color}) {
     return Text(
       text,
-      // You should replace primaryColor with the actual color definition
       style: TextStyle(
-        color: primaryColor,
+        color: color ?? primaryColor,
         fontSize: fontSize,
         fontWeight: FontWeight.w500,
       ),
     );
+  }
+
+  Color _statusColor(String status) {
+    switch (status) {
+      case 'new':
+        return Colors.blue;
+      case 'in_process':
+        return Colors.orange;
+      case 'rejected':
+        return Colors.red;
+      case 'done':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
   }
 }
