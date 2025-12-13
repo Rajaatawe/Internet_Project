@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:internet_application_project/core/config/app_configt.dart';
@@ -14,12 +15,46 @@ import 'package:internet_application_project/features/Form/presentation/preview.
 import 'package:internet_application_project/features/home_page/cubit/home_page_cubit.dart';
 import 'package:internet_application_project/features/home_page/cubit/home_page_state.dart';
 import 'package:internet_application_project/features/my_complaints/presentation/my_complaints_page.dart';
+import 'package:internet_application_project/features/notification/cubit/notification_cubit.dart';
+import 'package:internet_application_project/features/notification/widget/NotificationService.dart';
 import 'package:internet_application_project/features/settings/presentation/settings_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+final token = NotificationService().token;
+
+    if (token != null && token.isNotEmpty) {
+      final deviceType = getDeviceType(context);
+        final platform = getPlatform();
+      context.read<NotificationCubit>().saveToken(
+        token,
+        deviceType, 
+        platform,
+      );
+    }  }
+    String getPlatform() {
+  if (Platform.isAndroid) return 'android';
+  if (Platform.isIOS) return 'ios';
+  return 'unknown';
+}
+
+String getDeviceType(BuildContext context) {
+  final shortestSide = MediaQuery.of(context).size.shortestSide;
+  return shortestSide < 600 ? 'mobile' : 'tablet';
+}
+
+  @override
+    
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(context),

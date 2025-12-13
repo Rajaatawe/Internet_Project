@@ -23,10 +23,10 @@ class ComplaintsModel {
 
   factory ComplaintsModel.fromJson(Map<String, dynamic> json) =>
       ComplaintsModel(
-        success: json["success"],
-        message: json["message"],
+        success: json["success"] ?? false,
+        message: json["message"] ?? '',
         data: List<Complaint>.from(
-          json["data"].map((x) => Complaint.fromJson(x)),
+          (json["data"] ?? []).map((x) => Complaint.fromJson(x)),
         ),
       );
 
@@ -48,7 +48,7 @@ class Complaint {
   final GovernmentAgency governmentAgency;
   final ComplaintType complaintType;
   final List<Media> media;
-  final AssignedTo? assignedTo; // Nullable (some complaints may not be assigned)
+  final AssignedTo? assignedTo; // Nullable
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -69,24 +69,28 @@ class Complaint {
   });
 
   factory Complaint.fromJson(Map<String, dynamic> json) => Complaint(
-        id: json["id"],
-        referenceCode: json["reference_code"],
-        title: json["title"],
-        description: json["description"],
-        status: json["status"],
-        latitude: json["latitude"],
-        longitude: json["longitude"],
+        id: json["id"] ?? 0,
+        referenceCode: json["reference_code"] ?? '',
+        title: json["title"] ?? '',
+        description: json["description"] ?? '',
+        status: json["status"] ?? '',
+        latitude: json["latitude"] ?? '',
+        longitude: json["longitude"] ?? '',
         governmentAgency:
             GovernmentAgency.fromJson(json["government_agency"]),
         complaintType: ComplaintType.fromJson(json["complaint_type"]),
         media: List<Media>.from(
-          json["media"].map((x) => Media.fromJson(x)),
+          (json["media"] ?? []).map((x) => Media.fromJson(x)),
         ),
         assignedTo: json["assigned_to"] == null
             ? null
             : AssignedTo.fromJson(json["assigned_to"]),
-        createdAt: DateTime.parse(json["created_at"]),
-        updatedAt: DateTime.parse(json["updated_at"]),
+        createdAt: json["created_at"] != null
+            ? DateTime.parse(json["created_at"])
+            : DateTime.now(),
+        updatedAt: json["updated_at"] != null
+            ? DateTime.parse(json["updated_at"])
+            : DateTime.now(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -122,11 +126,11 @@ class AssignedTo {
   });
 
   factory AssignedTo.fromJson(Map<String, dynamic> json) => AssignedTo(
-        id: json["id"],
-        firstName: json["first_name"],
-        lastName: json["last_name"],
-        phone: json["phone"],
-        email: json["email"],
+        id: json["id"] ?? 0,
+        firstName: json["first_name"] ?? '',
+        lastName: json["last_name"] ?? '',
+        phone: json["phone"] ?? '',
+        email: json["email"] ?? '',
       );
 
   Map<String, dynamic> toJson() => {
@@ -147,10 +151,16 @@ class ComplaintType {
     required this.name,
   });
 
-  factory ComplaintType.fromJson(Map<String, dynamic> json) => ComplaintType(
-        id: json["id"],
-        name: json["name"],
-      );
+  factory ComplaintType.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return ComplaintType(id: 0, name: 'Unknown');
+    }
+
+    return ComplaintType(
+      id: json["id"] ?? 0,
+      name: json["name"] ?? 'Unknown',
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "id": id,
@@ -171,13 +181,19 @@ class GovernmentAgency {
     required this.phone,
   });
 
-  factory GovernmentAgency.fromJson(Map<String, dynamic> json) =>
-      GovernmentAgency(
-        id: json["id"],
-        agencyName: json["agency_name"],
-        email: json["email"],
-        phone: json["phone"],
-      );
+  factory GovernmentAgency.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return GovernmentAgency(
+          id: 0, agencyName: 'Unknown', email: '', phone: '');
+    }
+
+    return GovernmentAgency(
+      id: json["id"] ?? 0,
+      agencyName: json["agency_name"] ?? 'Unknown',
+      email: json["email"] ?? '',
+      phone: json["phone"] ?? '',
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "id": id,
@@ -196,10 +212,13 @@ class Media {
     required this.url,
   });
 
-  factory Media.fromJson(Map<String, dynamic> json) => Media(
-        id: json["id"],
-        url: json["url"],
-      );
+  factory Media.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return Media(id: 0, url: '');
+    return Media(
+      id: json["id"] ?? 0,
+      url: json["url"] ?? '',
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "id": id,

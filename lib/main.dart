@@ -8,13 +8,13 @@ import 'package:internet_application_project/features/home_page/presentation/hom
 import 'package:internet_application_project/features/my_complaints/presentation/my_complaints_page.dart';
 import 'package:internet_application_project/features/my_complaints/presentation/view_documents_page.dart';
 
-import 'package:internet_application_project/features/notification_page/NotificationService.dart';
+import 'package:internet_application_project/features/notification/widget/NotificationService.dart';
+import 'package:internet_application_project/features/notification/cubit/notification_cubit.dart';
 import 'package:provider/provider.dart';
 import 'core/services/service_locator.dart';
 import 'features/auth/cubit/auth_cubit.dart';
 import 'features/auth/presentation/login_page.dart';
 import 'features/auth/presentation/register.dart';
-
 
 Future<void> safeFirebaseInit() async {
   if (Firebase.apps.isEmpty) {
@@ -24,7 +24,6 @@ Future<void> safeFirebaseInit() async {
   }
 }
 
-
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await safeFirebaseInit();
@@ -33,7 +32,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Title: ${message.notification?.title}");
   print("Body: ${message.notification?.body}");
 }
-
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,6 +40,7 @@ void main() async {
   await safeFirebaseInit();
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  
   final appConst = AppConst();
   await appConst.init();
 
@@ -48,20 +48,16 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: appConst),
-
-
-
         Provider<RemoteService>(
-          create: (context) => RemoteService.getInstance(
-            context.read<AppConst>(),
-          ),
+          create: (context) =>
+              RemoteService.getInstance(context.read<AppConst>()),
+              
         ),
-      ],   // Provide AppConst to RemoteDatasource
+      ], // Provide AppConst to RemoteDatasource
       child: const MyApp(),
     ),
   );
 }
-
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -82,14 +78,20 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-         BlocProvider(
-              create: (_) => AuthCubit(
-                  remoteDatasource: context.read<RemoteService>())),
+        BlocProvider(create: (_) => NotificationCubit(remoteDatasource: context.read<RemoteService>())),
+
+        BlocProvider(
+          create: (_) =>
+              AuthCubit(remoteDatasource: context.read<RemoteService>()),
+        ),
         // BlocProvider(BlocProvider
         //     create: (_) => HomePageCubit(
         //         remoteService: context.read<RemoteService>())),
       ],
+      
       child: MaterialApp(
+          navigatorKey: navigatorKey,
+
         theme: ThemeData(fontFamily: 'Outfit'),
         debugShowCheckedModeBanner: false,
         home: const MyComplaintsPage(),

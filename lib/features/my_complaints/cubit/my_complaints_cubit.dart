@@ -15,7 +15,7 @@ class MyComplaintsCubit extends Cubit<MyComplaintsState> {
       : _remoteService = remoteService,
         super(const MyComplaintsState());
 
-  Future<void> loadHomePage() async {
+  Future<void> loadComplaints() async {
     emit(state.copyWith(state: StateValue.loading, message: ""));
 
     try {
@@ -23,7 +23,7 @@ class MyComplaintsCubit extends Cubit<MyComplaintsState> {
           await _remoteService.performGetListRequest<Complaint>(
         "my-complaints",
         (json) => Complaint.fromJson(json),
-        useToken: false,
+        useToken: true,
         isResponseEncrypted: false,
       );
 
