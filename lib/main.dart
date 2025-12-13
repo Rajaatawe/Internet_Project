@@ -6,6 +6,7 @@ import 'package:internet_application_project/core/config/app_configt.dart';
 import 'package:internet_application_project/core/services/generalized_api.dart';
 import 'package:internet_application_project/features/home_page/presentation/home_page.dart';
 import 'package:internet_application_project/features/my_complaints/presentation/my_complaints_page.dart';
+import 'package:internet_application_project/features/my_complaints/presentation/view_documents_page.dart';
 
 import 'package:internet_application_project/features/notification_page/NotificationService.dart';
 import 'package:provider/provider.dart';
@@ -40,19 +41,16 @@ void main() async {
   await safeFirebaseInit();
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  // to get saved preferences
   final appConst = AppConst();
   await appConst.init();
 
   runApp(
     MultiProvider(
       providers: [
-        // AppConst provider
         ChangeNotifierProvider.value(value: appConst),
 
 
 
-        // RemoteDatasource provider
         Provider<RemoteService>(
           create: (context) => RemoteService.getInstance(
             context.read<AppConst>(),
