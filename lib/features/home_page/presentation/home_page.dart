@@ -16,6 +16,7 @@ import 'package:internet_application_project/features/home_page/cubit/home_page_
 import 'package:internet_application_project/features/home_page/cubit/home_page_state.dart';
 import 'package:internet_application_project/features/my_complaints/presentation/my_complaints_page.dart';
 import 'package:internet_application_project/features/notification/cubit/notification_cubit.dart';
+import 'package:internet_application_project/features/notification/presentation/notifications_list_page.dart';
 import 'package:internet_application_project/features/notification/widget/NotificationService.dart';
 import 'package:internet_application_project/features/settings/presentation/settings_page.dart';
 
@@ -111,7 +112,11 @@ String getDeviceType(BuildContext context) {
       ),
       actions: [
         IconButton(
-          icon: Icon(Icons.notifications, color: darkBrown),
+          icon: GestureDetector(
+            onTap: () => NotificationsListPage(),
+            child: 
+
+          Icon(Icons.notifications, color: darkBrown)),
           iconSize: ResponsiveUtils.mediumIconSize(context),
           onPressed: () {},
         ),
