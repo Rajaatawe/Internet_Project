@@ -738,12 +738,12 @@ Future<void> performPostRequestNoRes(
       receiveTimeout: const Duration(seconds: 60),
     );
     if (useToken) {
-      String? token = '70|XlV8d5ZliYjb4fnsLQuvjLh4f5jh1FnHx4xpwrRE6344df5a';
-      // String? token = await _getToken();
-      // if (token == null) {
-      //   throw const RemoteExceptions(
-      //       ErrorCode.USER_DATA_NOT_FOUND, 'not logged in');
-      // }
+      // String? token = '70|XlV8d5ZliYjb4fnsLQuvjLh4f5jh1FnHx4xpwrRE6344df5a';
+      String? token = await _getToken();
+      if (token == null) {
+        throw  RemoteExceptions(
+            ErrorCode.USER_DATA_NOT_FOUND, 'not logged in');
+      }
       debugPrint("token: $token");
       options.headers = {
         'Content-Type': 'application/json',

@@ -44,7 +44,7 @@ class NotificationCubit extends Cubit<List<NotificationModel>> {
       "device_token": token,
       "device_type": deviceType,
       "platform": platform,
-    }, useToken: false);
+    }, useToken: true);
     emit(state);
   }
 }

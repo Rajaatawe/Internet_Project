@@ -28,35 +28,43 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-// final token = NotificationService().token;
+   bool _tokenSaved = false;
 
-    // if (token != null && token.isNotEmpty) {
-    //   final deviceType = getDeviceType(context);
-    //     final platform = getPlatform();
-    //   context.read<NotificationCubit>().saveToken(
-    //     token,
-    //     deviceType, 
-    //     platform,
-    //   );
-    // }
+  @override
+  void didChangeDependencies() {
+
+    super.didChangeDependencies();
+
+    if (_tokenSaved) return;
+
+    final token = NotificationService().token;
+    print(token);
+    if (token != null && token.isNotEmpty) {
+      final deviceType = getDeviceType(context);
+      final platform = getPlatform();
+
+      context.read<NotificationCubit>().saveToken(
+        token,
+        deviceType,
+        platform,
+      );
+
+      _tokenSaved = true; 
     }
-    String getPlatform() {
-  if (Platform.isAndroid) return 'android';
-  if (Platform.isIOS) return 'ios';
-  return 'unknown';
-}
+  }
 
-String getDeviceType(BuildContext context) {
-  final shortestSide = MediaQuery.of(context).size.shortestSide;
-  return shortestSide < 600 ? 'mobile' : 'tablet';
-}
+  String getPlatform() {
+    if (Platform.isAndroid) return 'android';
+    if (Platform.isIOS) return 'ios';
+    return 'unknown';
+  }
 
-  @override
-    
+  String getDeviceType(BuildContext context) {
+    final shortestSide = MediaQuery.of(context).size.shortestSide;
+    return shortestSide < 600 ? 'mobile' : 'tablet';
+  }
+      @override
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(context),
@@ -97,6 +105,7 @@ String getDeviceType(BuildContext context) {
 
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
+      backgroundColor: fourthColor,
       toolbarHeight: ResponsiveUtils.appBarHeight(context) + 10,
       centerTitle: true,
       titleTextStyle: TextStyle(
@@ -112,13 +121,15 @@ String getDeviceType(BuildContext context) {
       ),
       actions: [
         IconButton(
-          icon: GestureDetector(
-            onTap: () => NotificationsListPage(),
-            child: 
+          
+           icon: 
+           
 
-          Icon(Icons.notifications, color: darkBrown)),
+          Icon(Icons.notifications, color: darkBrown),
           iconSize: ResponsiveUtils.mediumIconSize(context),
-          onPressed: () {},
+          onPressed: () {  Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const NotificationsListPage()),
+            );},
         ),
         if (!ResponsiveUtils.isMobile(context))
           SizedBox(width: ResponsiveUtils.smallSpacing(context)),

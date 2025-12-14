@@ -101,7 +101,7 @@ class _OtpDialogContentState extends State<OtpDialogContent> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Container(
           width: ResponsiveUtils.isMobile(context)
-              ? MediaQuery.of(context).size.width * 0.9
+              ? MediaQuery.of(context).size.width 
               : ResponsiveUtils.isTablet(context)
                   ? 480
                   : 520,
@@ -152,7 +152,7 @@ class _OtpDialogContentState extends State<OtpDialogContent> {
       children: List.generate(6, (index) {
         return Container(
           margin: EdgeInsets.only(right: index < 5 ? spacing : 0),
-          width: boxSize * 0.8,
+          width: boxSize * 0.75,
           height: boxSize.toDouble(),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
