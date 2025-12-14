@@ -120,10 +120,11 @@ await _remoteDatasource.performPostRequestNoRes("verify-otp",{'otp':code ,'email
   // --------------------------
   // LOGOUT
   // --------------------------
+
   Future<void> logout() async {
     emit(state.copyWith(logoutState: StateValue.loading));
     try {
-     await _remoteDatasource.performLogoutRequest("logout",useToken: true);
+     await _remoteDatasource.performDeleteRequestNoRes("logout",useToken: true);
       emit(state.copyWith(
         logoutState: StateValue.success,
         logoutMessage: "Logout done",
