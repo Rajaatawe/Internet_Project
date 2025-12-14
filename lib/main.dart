@@ -111,7 +111,7 @@ class _MyAppState extends State<MyApp> {
 
         theme: ThemeData(fontFamily: 'Outfit'),
         debugShowCheckedModeBanner: false,
-        home: const MyComplaintsPage(),
+        home: const LoginPage(),
       ),
     );
   }
