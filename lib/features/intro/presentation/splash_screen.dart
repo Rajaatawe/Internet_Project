@@ -11,7 +11,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   double _opacity = 0.0;
-  double _logoSize = 150.0; // Initial size for the logo
+  double _logoSize = 150.0; 
 
   @override
   void initState() {
@@ -23,7 +23,6 @@ class _SplashScreenState extends State<SplashScreen> {
       });
     });
 
-    // Start the morph animation after a delay
     Future.delayed(Duration(seconds: 1), () {
       setState(() {
         _logoSize = 250.0; // Increase size for morph effect
@@ -76,7 +75,7 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
               SizedBox(height: 20),
               Text(
-                'Welcome to Koul',
+                'Welcome to Sajelha',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,

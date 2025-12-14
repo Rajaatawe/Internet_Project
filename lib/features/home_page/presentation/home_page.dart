@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
     //     deviceType, 
     //     platform,
     //   );
-    // }  
+    // }
     }
     String getPlatform() {
   if (Platform.isAndroid) return 'android';
