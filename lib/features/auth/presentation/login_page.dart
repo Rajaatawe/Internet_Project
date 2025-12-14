@@ -9,6 +9,7 @@ import 'package:internet_application_project/core/widgets/custom_button.dart';
 import 'package:internet_application_project/features/auth/presentation/register.dart';
 import 'package:internet_application_project/features/auth/widgets/auth_text_field.dart';
 import 'package:internet_application_project/features/auth/widgets/captcha_dialog.dart';
+import 'package:internet_application_project/features/home_page/presentation/home_page.dart';
 
 import '../../../core/models/enum/states_enum.dart';
 import '../cubit/auth_cubit.dart';
@@ -252,7 +253,13 @@ class _LoginPageState extends State<LoginPage> {
                     listener: (context,state) {
                       if (state.loginState == StateValue.loaded){
                         print("print success Login");
-
+                       Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => HomePage(),
+                                            ),
+                                            (Route<dynamic> route) => false,
+                                          );
                       }else if(state.loginState == StateValue.error){
                         print("///////////////////////////////////////////////Error login");
                       }

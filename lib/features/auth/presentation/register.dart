@@ -117,8 +117,8 @@ class _RegisterPageState extends State<RegisterPage> {
               keyboardType: TextInputType.text,
               maxLines: 1,
               textEditingController: firstNameController,
-              validator: (value) =>
-                  value?.isEmpty ?? true ? 'First name is required' : null,
+             validator: (v) => validateName(v, 'First name'),
+
               obscureText: false,
               showLabel: false,
               filled: false,
@@ -133,7 +133,11 @@ class _RegisterPageState extends State<RegisterPage> {
               keyboardType: TextInputType.text,
               maxLines: 1,
               textEditingController: middleNameController,
-              validator: (value) => null, // Optional
+              validator: (v) {
+  if (v == null || v.trim().isEmpty) return null;
+  return validateName(v, 'Middle name');
+},
+
               obscureText: false,
               showLabel: false,
               filled: false,
@@ -148,8 +152,8 @@ class _RegisterPageState extends State<RegisterPage> {
               keyboardType: TextInputType.text,
               maxLines: 1,
               textEditingController: lastNameController,
-              validator: (value) =>
-                  value?.isEmpty ?? true ? 'Last name is required' : null,
+             validator: (v) => validateName(v, 'Last name'),
+
               obscureText: false,
               showLabel: false,
               filled: false,
