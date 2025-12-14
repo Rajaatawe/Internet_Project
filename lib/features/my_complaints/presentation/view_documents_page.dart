@@ -26,15 +26,14 @@ class ViewDocumentsPage extends StatelessWidget {
     final files = <String>[];
 
     for (final media in mediaList) {
-      final url = media.url;
-      final lower = url.toLowerCase();
+      final url = media.url.toLowerCase();
 
-      if (_isImageFile(lower)) {
-        photos.add(url);
-      } else if (_isVideoFile(lower)) {
-        videos.add(url);
+      if (_isImageFile(url)) {
+        photos.add(media.url);
+      } else if (_isVideoFile(url)) {
+        videos.add(media.url);
       } else {
-        files.add(url);
+        files.add(media.url);
       }
     }
 
@@ -57,11 +56,7 @@ class ViewDocumentsPage extends StatelessWidget {
       url.endsWith('.mov') ||
       url.endsWith('.avi') ||
       url.endsWith('.mkv') ||
-      url.contains('youtube') ||
-      url.contains('video');
-
-  bool _isUrl(String path) =>
-      path.startsWith('http://') || path.startsWith('https://');
+      url.contains('youtube');
 
   // ===================== UI =====================
   @override
@@ -70,9 +65,6 @@ class ViewDocumentsPage extends StatelessWidget {
     final fontSize = ResponsiveUtils.bodyTextSize(context);
 
     final categorized = _categorizeMedia();
-    final photos = categorized['photos']!;
-    final videos = categorized['videos']!;
-    final files = categorized['files']!;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -85,22 +77,22 @@ class ViewDocumentsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (photos.isNotEmpty) ...[
-              _sectionTitle('Photos', photos.length, fontSize),
-              _photoGrid(context, photos),
+            if (categorized['photos']!.isNotEmpty) ...[
+              _sectionTitle('Photos', categorized['photos']!.length, fontSize),
+              _photoGrid(context, categorized['photos']!),
               SizedBox(height: spacing * 2),
             ],
-            if (videos.isNotEmpty) ...[
-              _sectionTitle('Videos', videos.length, fontSize),
-              _videoGrid(context, videos),
+            if (categorized['videos']!.isNotEmpty) ...[
+              _sectionTitle('Videos', categorized['videos']!.length, fontSize),
+              _videoGrid(context, categorized['videos']!),
               SizedBox(height: spacing * 2),
             ],
-            if (files.isNotEmpty) ...[
+            if (categorized['files']!.isNotEmpty) ...[
               const Divider(color: Colors.brown),
-              _sectionTitle('Files', files.length, fontSize),
-              _fileGrid(context, files),
+              _sectionTitle('Files', categorized['files']!.length, fontSize),
+              _fileGrid(context, categorized['files']!),
             ],
-            if (mediaList.isEmpty) _emptyState(context),
+            if (mediaList.isEmpty) _emptyState(),
           ],
         ),
       ),
@@ -117,7 +109,7 @@ class ViewDocumentsPage extends StatelessWidget {
     );
   }
 
-  // ===================== Photo =====================
+  // ===================== Photos =====================
   Widget _photoGrid(BuildContext context, List<String> photos) {
     return GridView.builder(
       shrinkWrap: true,
@@ -143,7 +135,7 @@ class ViewDocumentsPage extends StatelessWidget {
     );
   }
 
-  // ===================== Video =====================
+  // ===================== Videos =====================
   Widget _videoGrid(BuildContext context, List<String> videos) {
     return GridView.builder(
       shrinkWrap: true,
@@ -183,8 +175,8 @@ class ViewDocumentsPage extends StatelessWidget {
         childAspectRatio: 0.9,
       ),
       itemBuilder: (_, i) {
-        final file = files[i];
-        final name = file.split('/').last.toLowerCase();
+        final fileUrl = files[i];
+        final name = fileUrl.split('/').last.toLowerCase();
 
         IconData icon = Icons.insert_drive_file;
         Color color = Colors.brown;
@@ -195,7 +187,7 @@ class ViewDocumentsPage extends StatelessWidget {
         }
 
         return GestureDetector(
-          onTap: () => openPdfFromHttp(file),
+          onTap: () => _openAnyFile(fileUrl),
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
@@ -220,11 +212,10 @@ class ViewDocumentsPage extends StatelessWidget {
     );
   }
 
-  // ===================== Empty =====================
-  Widget _emptyState(BuildContext context) {
-    return Center(
+  Widget _emptyState() {
+    return const Center(
       child: Column(
-        children: const [
+        children: [
           SizedBox(height: 120),
           Icon(Icons.folder_open, size: 64, color: Colors.grey),
           SizedBox(height: 10),
@@ -235,69 +226,62 @@ class ViewDocumentsPage extends StatelessWidget {
   }
 
   // ===================== Actions =====================
-  void _openPhoto(BuildContext context, String url) {
+
+  Future<File?> _downloadFile(String url) async {
+    try {
+      final uri = Uri.parse(url);
+      final dir = await getTemporaryDirectory();
+      final filePath = '${dir.path}/${uri.pathSegments.last}';
+
+      final request = await HttpClient().getUrl(uri);
+      final response = await request.close();
+
+      if (response.statusCode != 200) {
+        throw Exception('Download failed');
+      }
+
+      final bytes = await consolidateHttpClientResponseBytes(response);
+      final file = File(filePath);
+      await file.writeAsBytes(bytes);
+
+      return file;
+    } catch (e) {
+      debugPrint('Download error: $e');
+      return null;
+    }
+  }
+
+  Future<void> _openPhoto(BuildContext context, String url) async {
+    final file = await _downloadFile(url);
+    if (file == null) return;
+
     showDialog(
       context: context,
       builder: (_) => Dialog(
         backgroundColor: Colors.black,
-        child: Image.network(url, fit: BoxFit.contain),
+        insetPadding: const EdgeInsets.all(20),
+        child: InteractiveViewer(
+          child: Image.file(file),
+        ),
       ),
     );
   }
 
-Future<void> _launchURL(String url) async {
-  try {
-    final uri = Uri.parse(url);
+  Future<void> _openAnyFile(String url) async {
+    final file = await _downloadFile(url);
+    if (file == null) return;
 
-    await launchUrl(
-      uri,
-      mode: LaunchMode.externalApplication,
-    );
-  } catch (e) {
-    debugPrint('Open URL failed: $e');
+    await OpenFilex.open(file.path);
+  }
 
-    if (navigatorKey1.currentContext != null) {
-      ScaffoldMessenger.of(navigatorKey1.currentContext!).showSnackBar(
-        const SnackBar(
-          content: Text('لا يمكن فتح الرابط'),
-          backgroundColor: Colors.red,
-        ),
+  Future<void> _launchURL(String url) async {
+    try {
+      await launchUrl(
+        Uri.parse(url),
+        mode: LaunchMode.externalApplication,
       );
-    }
-  }
-}
-
-Future<void> openPdfFromHttp(String url) async {
-  try {
-    final dir = await getTemporaryDirectory();
-    final filePath = '${dir.path}/${url.split('/').last}';
-
-    final request = await HttpClient().getUrl(Uri.parse(url));
-    final response = await request.close();
-    final bytes = await consolidateHttpClientResponseBytes(response);
-
-    final file = File(filePath);
-    await file.writeAsBytes(bytes);
-
-    await OpenFilex.open(filePath);
-  } catch (e) {
-    debugPrint('Failed to open PDF: $e');
-  }
-}
-
-  Future<void> _openFile(String path) async {
-    if (_isUrl(path)) {
-      await _launchURL(path);
-    } else {
-      await OpenFilex.open(path);
-    }
-  }
-
-  void _showError(String msg) {
-    if (navigatorKey1.currentContext != null) {
-      ScaffoldMessenger.of(navigatorKey1.currentContext!).showSnackBar(
-        SnackBar(content: Text(msg), backgroundColor: Colors.red),
-      );
+    } catch (e) {
+      debugPrint('Open URL failed: $e');
     }
   }
 }
