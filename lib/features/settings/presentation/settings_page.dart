@@ -23,26 +23,42 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(title: 'Settings', icon: Icons.arrow_back),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: ResponsiveUtils.contentPadding(context) * 0.00001,
-          child: Column(
-            children: [
-              // SizedBox(height: ResponsiveUtils.mediumSpacing(context)),
-              _buildGeneralSection(),
-              SizedBox(height: ResponsiveUtils.largeSpacing(context)),
+    return BlocListener<AuthCubit, AuthState>(
+      listener: (context, state) {
+        if (state.logoutState == StateValue.success) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const LoginPage()),
+            (route) => false,
+          );
+        }
 
-              _buildAccountSection(),
-              SizedBox(height: ResponsiveUtils.largeSpacing(context)),
+        if (state.logoutState == StateValue.error) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.logoutMessage)));
+        }
+      },
+      child: Scaffold(
+        appBar: CustomAppBar(title: 'Settings', icon: Icons.arrow_back),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: ResponsiveUtils.contentPadding(context) * 0.00001,
+            child: Column(
+              children: [
+                // SizedBox(height: ResponsiveUtils.mediumSpacing(context)),
+                _buildGeneralSection(),
+                SizedBox(height: ResponsiveUtils.largeSpacing(context)),
 
-              _buildInfoSection(),
-              SizedBox(height: ResponsiveUtils.extraLargeSpacing(context)),
+                _buildAccountSection(),
+                SizedBox(height: ResponsiveUtils.largeSpacing(context)),
 
-              _buildLogoutButton(context),
-              SizedBox(height: ResponsiveUtils.largeSpacing(context)),
-            ],
+                _buildInfoSection(),
+                SizedBox(height: ResponsiveUtils.extraLargeSpacing(context)),
+
+                _buildLogoutButton(context),
+                SizedBox(height: ResponsiveUtils.largeSpacing(context)),
+              ],
+            ),
           ),
         ),
       ),
@@ -267,47 +283,50 @@ class _SettingsPageState extends State<SettingsPage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: ResponsiveUtils.screenPadding(context),
-        child: Container(
-          padding: EdgeInsets.all(ResponsiveUtils.largeSpacing(context)),
-          decoration: BoxDecoration(
-            color: const Color(0xfffdf6f4),
-            borderRadius: BorderRadius.circular(
-              ResponsiveUtils.largeBorderRadius(context),
+      builder: (_) => BlocProvider.value(
+        value: BlocProvider.of<AuthCubit>(context),
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: ResponsiveUtils.screenPadding(context),
+          child: Container(
+            padding: EdgeInsets.all(ResponsiveUtils.largeSpacing(context)),
+            decoration: BoxDecoration(
+              color: const Color(0xfffdf6f4),
+              borderRadius: BorderRadius.circular(
+                ResponsiveUtils.largeBorderRadius(context),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 15,
+                  offset: const Offset(0, 6),
+                ),
+              ],
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.08),
-                blurRadius: 15,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "Are you sure?",
-                style: TextStyle(
-                  fontSize: ResponsiveUtils.headlineTextSize(context),
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xff5a4638),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Are you sure?",
+                  style: TextStyle(
+                    fontSize: ResponsiveUtils.headlineTextSize(context),
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xff5a4638),
+                  ),
                 ),
-              ),
-              SizedBox(height: ResponsiveUtils.smallSpacing(context)),
-              Text(
-                "you want to log out",
-                style: TextStyle(
-                  fontSize: ResponsiveUtils.bodyTextSize(context),
-                  color: const Color(0xff8b6f5a),
-                  fontWeight: FontWeight.w500,
+                SizedBox(height: ResponsiveUtils.smallSpacing(context)),
+                Text(
+                  "you want to log out",
+                  style: TextStyle(
+                    fontSize: ResponsiveUtils.bodyTextSize(context),
+                    color: const Color(0xff8b6f5a),
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-              SizedBox(height: ResponsiveUtils.largeSpacing(context)),
-              _buildDialogButtons(context),
-            ],
+                SizedBox(height: ResponsiveUtils.largeSpacing(context)),
+                _buildDialogButtons(context),
+              ],
+            ),
           ),
         ),
       ),
@@ -328,8 +347,7 @@ class _SettingsPageState extends State<SettingsPage> {
             titleColor: Colors.white,
             backgroundColor: Colors.red,
             onTap: () {
-              Navigator.pop(context);
-              // TODO: add logout logic here
+              context.read<AuthCubit>().logout();
             },
           ),
           SizedBox(height: ResponsiveUtils.smallSpacing(context)),
@@ -347,30 +365,19 @@ class _SettingsPageState extends State<SettingsPage> {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          BlocListener<AuthCubit, AuthState>(
-            listener: (context, state) {
-              if(state.logoutState == StateValue.loading){
-                  context.read<AuthCubit>().logout();
-              }
-              else if(state.logoutState == StateValue.success){
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => LoginPage()),
-              (Route<dynamic> route) => false, // This will remove all routes
-            );
-              }
-            },
-            child: CustomButton(
-              height: ResponsiveUtils.buttonHeight(context),
-              width: ResponsiveUtils.buttonWidth(
-                context,
-                tabletRatio: 0.25,
-                desktopRatio: 0.2,
-              ),
-              title: 'confirm',
-              titleColor: Colors.white,
-              backgroundColor: Colors.red,
-              onTap: () {},
+          CustomButton(
+            height: ResponsiveUtils.buttonHeight(context),
+            width: ResponsiveUtils.buttonWidth(
+              context,
+              tabletRatio: 0.25,
+              desktopRatio: 0.2,
             ),
+            title: 'confirm',
+            titleColor: Colors.white,
+            backgroundColor: Colors.red,
+            onTap: () {
+              context.read<AuthCubit>().logout();
+            },
           ),
           CustomButton(
             height: ResponsiveUtils.buttonHeight(context),

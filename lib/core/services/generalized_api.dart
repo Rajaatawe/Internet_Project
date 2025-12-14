@@ -718,6 +718,41 @@ Future<void> performPostRequestNoRes(
       );
     }
   }
+Future<void> performDeleteRequestNoRes(
+  String endpoint, {
+  bool useToken = true,
+}) async {
+  debugPrint('DELETE endpoint: $endpoint');
+
+  try {
+    final response = await dio.deleteUri(
+      uri.resolve(baseUrl + endpoint),
+      options: await _setOptions(useToken),
+    );
+
+    debugPrint('response: $response');
+
+    if (!ErrorHandler.handleRemoteStatusCode(
+      response.statusCode!,
+      response.data,
+    )) {
+      throw RemoteExceptions(
+        ErrorCode.SERVER_ERROR,
+        ErrorCode.SERVER_ERROR.getLocalizedMessage(),
+      );
+    }
+  } catch (e) {
+    if (e is RemoteExceptions) rethrow;
+    if (e is DioError) throw ErrorHandler.handleDioError(e);
+
+    debugPrint(" App-level error: ${e.toString()}");
+    debugPrintStack();
+    throw RemoteExceptions(
+      ErrorCode.APP_ERROR,
+      ErrorCode.APP_ERROR.getLocalizedMessage(),
+    );
+  }
+}
 
   Future<String?> _getToken() async {
     if (_cachedToken != null) {
@@ -738,12 +773,12 @@ Future<void> performPostRequestNoRes(
       receiveTimeout: const Duration(seconds: 60),
     );
     if (useToken) {
-      // String? token = '70|XlV8d5ZliYjb4fnsLQuvjLh4f5jh1FnHx4xpwrRE6344df5a';
+      // String? token = '46|buJtZa1MEvCB6zdHSAnvMKTv1FdJn92rfVhWvOtO295c7209';
       String? token = await _getToken();
-      if (token == null) {
-        throw  RemoteExceptions(
-            ErrorCode.USER_DATA_NOT_FOUND, 'not logged in');
-      }
+      // if (token == null) {
+      //   throw const RemoteExceptions(
+      //       ErrorCode.USER_DATA_NOT_FOUND, 'not logged in');
+      // }
       debugPrint("token: $token");
       options.headers = {
         'Content-Type': 'application/json',
